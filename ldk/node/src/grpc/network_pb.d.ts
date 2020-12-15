@@ -8,6 +8,29 @@ import * as jspb from "google-protobuf";
 import * as google_protobuf_struct_pb from "google-protobuf/google/protobuf/struct_pb";
 import * as session_pb from "./session_pb";
 
+export class Header extends jspb.Message { 
+    clearValuesList(): void;
+    getValuesList(): Array<string>;
+    setValuesList(value: Array<string>): Header;
+    addValues(value: string, index?: number): string;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): Header.AsObject;
+    static toObject(includeInstance: boolean, msg: Header): Header.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: Header, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Header;
+    static deserializeBinaryFromReader(message: Header, reader: jspb.BinaryReader): Header;
+}
+
+export namespace Header {
+    export type AsObject = {
+        valuesList: Array<string>,
+    }
+}
+
 export class HTTPRequestMsg extends jspb.Message { 
 
     hasSession(): boolean;
@@ -27,7 +50,7 @@ export class HTTPRequestMsg extends jspb.Message {
     setBody(value: Uint8Array | string): HTTPRequestMsg;
 
 
-    getHeadersMap(): jspb.Map<string, string>;
+    getHeadersMap(): jspb.Map<string, Header>;
     clearHeadersMap(): void;
 
 
@@ -48,7 +71,7 @@ export namespace HTTPRequestMsg {
         method: string,
         body: Uint8Array | string,
 
-        headersMap: Array<[string, string]>,
+        headersMap: Array<[string, Header.AsObject]>,
     }
 }
 
@@ -62,7 +85,7 @@ export class HTTPResponseMsg extends jspb.Message {
     setData(value: Uint8Array | string): HTTPResponseMsg;
 
 
-    getHeadersMap(): jspb.Map<string, google_protobuf_struct_pb.ListValue>;
+    getHeadersMap(): jspb.Map<string, Header>;
     clearHeadersMap(): void;
 
 
@@ -81,6 +104,6 @@ export namespace HTTPResponseMsg {
         responsecode: number,
         data: Uint8Array | string,
 
-        headersMap: Array<[string, google_protobuf_struct_pb.ListValue.AsObject]>,
+        headersMap: Array<[string, Header.AsObject]>,
     }
 }
