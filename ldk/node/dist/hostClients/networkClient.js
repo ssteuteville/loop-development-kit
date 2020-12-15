@@ -21,10 +21,11 @@ function parseHeaderValues(values) {
  * @internal
  */
 function parseHeadersMap(headersMap) {
-    const headerEntries = headersMap.getEntryList().map(([key, value]) => {
-        return [key, parseHeaderValues(value)];
+    const record = {};
+    headersMap.forEach((values, key) => {
+        record[key] = parseHeaderValues(values);
     });
-    return new Map(headerEntries);
+    return record;
 }
 /**
  * Adds headers to a request message
@@ -34,7 +35,7 @@ function parseHeadersMap(headersMap) {
  * @internal
  */
 function addHeadersToMessage(message, headers) {
-    headers.forEach((key, value) => {
+    Object.entries(headers).forEach(([key, value]) => {
         message.getHeadersMap().set(key, value);
     });
     return message;
