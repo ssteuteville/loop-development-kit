@@ -1,4 +1,4 @@
-import {NetworkClient} from './networkClient';
+import { NetworkClient } from './networkClient';
 import { Logger } from '../logging';
 
 const logger = new Logger('integration-test-logger');
@@ -21,24 +21,24 @@ describe('NetworkHostClient', () => {
     await subject.connect(connInfo, session, logger);
   });
 
-  describe("#httpRequest", () => {
-    test("returns response details in the expected form", async () => {
+  describe('#httpRequest', () => {
+    test('returns response details in the expected form', async () => {
       const request = {
-        url: "http://test.example.com",
-        method: "GET",
-        body: "",
+        url: 'http://test.example.com',
+        method: 'GET',
+        body: '',
         headers: {
-          "Cookie": "monster=true"
-        }
-      }
+          Cookie: ['monster=true'],
+        },
+      };
 
       const response = await subject.httpRequest(request);
 
       expect(response).toMatchObject({
         statusCode: expect.any(Number),
         data: expect.any(Uint8Array),
-        headers: expect.any(Object)
+        headers: expect.any(Object),
       });
-    })
-  })
+    });
+  });
 });

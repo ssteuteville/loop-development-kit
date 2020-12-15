@@ -31,9 +31,9 @@ namespace OliveHelpsLDK.Test.Network.Integration
             var request = new HTTPRequest()
             {
                 URL = "http://test.example.com",
-                Headers = new Dictionary<string, string>()
+                Headers = new Dictionary<string, IList<string>>()
                 {
-                    {"Cookie", "monster=true"}
+                    {"Cookie", new List<string>(new string[]{"cookie=monster"})}
                 },
                 Method = "GET",
                 Body = new byte[] { 0x20 } 
