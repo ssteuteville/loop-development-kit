@@ -1,32 +1,21 @@
-import structpb from 'google-protobuf/google/protobuf/struct_pb';
 import jspb from 'google-protobuf';
 import BaseClient, { GRPCClientConstructor } from './baseClient';
 import { NetworkClient as NetworkGRPCClient } from '../grpc/network_grpc_pb';
 import { NetworkService, HttpRequest, HttpResponse } from './networkService';
-import messages from '../grpc/network_pb';
-
-/**
- * @param values - a PB struct ListValue (list of Values)
- * @internal
- */
-function parseHeaderValues(values: structpb.ListValue): Array<string> {
-  return values.getValuesList().map((value) => {
-    return value.getStringValue();
-  });
-}
+import messages, { Header } from '../grpc/network_pb';
 
 /**
  * @param headersMap - A map of headers
  * @internal
  */
 function parseHeadersMap(
-  headersMap: jspb.Map<string, structpb.ListValue>,
+  headersMap: jspb.Map<string, Header>,
 ): Record<string, Array<string>> {
   const record: Record<string, Array<string>> = {};
 
   headersMap.forEach((values, key) => {
-    record[key] = parseHeaderValues(values);
-  })
+    record[key] = values.getValuesList();
+  });
 
   return record;
 }
@@ -40,10 +29,10 @@ function parseHeadersMap(
  */
 function addHeadersToMessage(
   message: messages.HTTPRequestMsg,
-  headers: Record<string, string>,
+  headers: Record<string, Array<string>>,
 ): messages.HTTPRequestMsg {
-  Object.entries(headers).forEach(([key, value]) => {
-    message.getHeadersMap().set(key, value);
+  Object.entries(headers).forEach(([key, values]) => {
+    message.getHeadersMap().set(key, new Header().setValuesList(values));
   });
 
   return message;

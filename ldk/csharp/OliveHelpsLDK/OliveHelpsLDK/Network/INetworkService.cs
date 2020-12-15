@@ -17,7 +17,7 @@ namespace OliveHelpsLDK.Network
 
         public byte[] Body;
 
-        public IDictionary<string, string> Headers;
+        public IDictionary<string, IList<string>> Headers;
     }
 
     public struct HTTPResponse
