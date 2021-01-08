@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -131,31 +132,39 @@ namespace OliveHelpsLDK
             return task.ContinueWith(action =>
             {
                 if (action.Exception == null) return action.Result;
-                token.Register(() => throw action.Exception);
-                action.Exception.Handle(exception =>
-                {
-                    logger.Error("Client exception", exception);
-                    return true;
-                });
-
+                HandleException(action.Exception, logger, token);
                 return action.Result;
             }, token, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current);
         }
         
-        // TODO - dry this up
+        /// <summary>
+        /// Adds an exception logging continuation to a task.
+        /// </summary>
+        /// <remarks>Non-generic version of this function.</remarks>
         private static Task WrapContinueHandler(Task task, ILogger logger,
             CancellationToken token)
         {
             return task.ContinueWith(action =>
             {
                 if (action.Exception == null) return;
-                token.Register(() => throw action.Exception);
-                action.Exception.Handle(exception =>
+                HandleException(action.Exception, logger, token);
+            }, token, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current);
+        }
+
+        /// <summary>
+        /// Handles and logs an exception.
+        /// </summary>
+        /// <param name="aex">A Task's aggregate exception.</param>
+        /// <param name="logger">The logger used in exception handling.</param>
+        /// <param name="token">A cancellation token to which this will register a re-throw.</param>
+        private static void HandleException(AggregateException aex, ILogger logger, CancellationToken token)
+        {
+                token.Register(() => throw aex);
+                aex.Handle(exception =>
                 {
                     logger.Error("Client exception", exception);
                     return true;
                 });
-            }, token, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current);
         }
 
         /// <summary>
