@@ -1,4 +1,4 @@
-package ldk
+package utils
 
 // OperatingSystem is a grouping of entity type
 type OperatingSystem string

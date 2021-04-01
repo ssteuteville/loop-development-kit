@@ -3,13 +3,13 @@ package loop_test
 import (
 	"context"
 	"errors"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/whisper-list/loop"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -34,7 +34,7 @@ func TestLoop(t *testing.T) {
 		},
 	}
 
-	l := ldk.NewLogger("example-whisper-list")
+	l := utils.NewLogger("example-whisper-list")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)

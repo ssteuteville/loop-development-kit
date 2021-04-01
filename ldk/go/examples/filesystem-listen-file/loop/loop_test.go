@@ -3,6 +3,7 @@ package loop_test
 import (
 	"context"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"os"
 	"testing"
@@ -33,7 +34,7 @@ func TestController(t *testing.T) {
 			},
 		},
 	}
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"time"
 
@@ -37,7 +39,7 @@ type apiResponse struct {
 
 // Serve allows Olive Helps to have access the loop
 func Serve() error {
-	l := ldk.NewLogger("example-whisper-disambiguation")
+	l := utils.NewLogger("example-whisper-disambiguation")
 	loop, err := NewLoop(l)
 	if err != nil {
 		return err
@@ -51,19 +53,19 @@ type Loop struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	sidekick ldk.Sidekick
-	logger   *ldk.Logger
+	sidekick client.Sidekick
+	logger   *utils.Logger
 }
 
 // NewLoop returns a pointer to a loop
-func NewLoop(logger *ldk.Logger) (*Loop, error) {
+func NewLoop(logger *utils.Logger) (*Loop, error) {
 	return &Loop{
 		logger: logger,
 	}, nil
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
-func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
+func (c *Loop) LoopStart(sidekick client.Sidekick) error {
 	c.logger.Info("Starting example whisper disambiguation loop")
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 
@@ -71,7 +73,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 
 	now := time.Now()
 
-	response, err := sidekick.Network().HTTPRequest(c.ctx, &client.HTTPRequest{
+	response, err := sidekick.Network().HTTPRequest(c.ctx, &service.HTTPRequest{
 		URL:    "https://api.fda.gov/food/enforcement.json?search=report_date:[" + now.AddDate(0, -3, 0).Format("20060102") + "+TO+" + now.Format("20060102") + "]&limit=10",
 		Method: "GET",
 		Body:   nil,

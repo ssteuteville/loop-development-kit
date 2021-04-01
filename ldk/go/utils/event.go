@@ -1,4 +1,4 @@
-package ldk
+package utils
 
 // Event is a structure that defines a sensor event
 type Event struct {

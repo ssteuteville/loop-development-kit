@@ -3,12 +3,12 @@ package loop_test
 import (
 	"context"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/search-searchbar/loop"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -33,7 +33,7 @@ func TestSearchResponse(t *testing.T) {
 			},
 		},
 	}
-	logger := ldk.NewLogger("loop-example")
+	logger := utils.NewLogger("loop-example")
 	l, err := loop.NewLoop(logger)
 	if err != nil {
 		t.Fatal(err)

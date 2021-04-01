@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/whisper-form/loop"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -45,7 +45,7 @@ func TestWhisperFormResolved(t *testing.T) {
 		},
 	}
 
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)
@@ -197,7 +197,7 @@ func TestWhisperFormRejected(t *testing.T) {
 		},
 	}
 
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)
@@ -367,7 +367,7 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 		},
 	}
 
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)
@@ -523,7 +523,7 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 		},
 	}
 
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)

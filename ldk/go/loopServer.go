@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-plugin"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -16,7 +18,7 @@ type LoopServer struct {
 
 	Broker *plugin.GRPCBroker
 	Conn   *grpc.ClientConn
-	Logger *Logger
+	Logger *utils.Logger
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
@@ -35,49 +37,49 @@ func (m *LoopServer) LoopStart(_ context.Context, req *proto.LoopStartRequest) (
 		return &emptypb.Empty{}, err
 	}
 
-	eli := &ExceptionLoggingInterceptor{
+	eli := &utils.ExceptionLoggingInterceptor{
 		InterceptedConn: m.Conn,
 		Logger:          m.Logger,
 	}
 
-	sidekickClient := &SidekickClient{
-		VaultService: &VaultClient{
+	sidekickClient := &client.SidekickClient{
+		VaultService: &client.VaultClient{
 			VaultClient:  proto.NewVaultClient(eli),
 			Session: session,
 		},
-		WhisperService: &WhisperClient{
+		WhisperService: &client.WhisperClient{
 			WhisperClient:  proto.NewWhisperClient(eli),
 			Session: session,
 		},
-		ClipboardService: &ClipboardClient{
+		ClipboardService: &client.ClipboardClient{
 			ClipboardClient:  proto.NewClipboardClient(eli),
 			Session: session,
 		},
-		KeyboardService: &KeyboardClient{
+		KeyboardService: &client.KeyboardClient{
 			KeyboardClient:  proto.NewKeyboardClient(eli),
 			Session: session,
 		},
-		ProcessService: &ProcessClient{
+		ProcessService: &client.ProcessClient{
 			ProcessClient:  proto.NewProcessClient(eli),
 			Session: session,
 		},
-		CursorService: &CursorClient{
+		CursorService: &client.CursorClient{
 			CursorClient:  proto.NewCursorClient(eli),
 			Session: session,
 		},
-		FilesystemService: &FilesystemClient{
+		FilesystemService: &client.FilesystemClient{
 			FilesystemClient:  proto.NewFilesystemClient(eli),
 			Session: session,
 		},
-		UiService: &UIClient{
+		UiService: &client.UIClient{
 			UiClient:  proto.NewUIClient(eli),
 			Session: session,
 		},
-		NetworkService: &NetworkClient{
+		NetworkService: &client.NetworkClient{
 			NetworlClient:  proto.NewNetworkClient(eli),
 			Session: session,
 		},
-		WindowService: &WindowClient{
+		WindowService: &client.WindowClient{
 			WindowClient:  proto.NewWindowClient(eli),
 			Session: session,
 		},

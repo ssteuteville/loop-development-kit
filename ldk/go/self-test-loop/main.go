@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/open-olive/loop-development-kit/ldk/go/self-test-loop/util"
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
@@ -21,7 +22,7 @@ const storageTestValue = "TEST_VALUE"
 const testFileSize = 512
 
 func main() {
-	logger := ldk.NewLogger("self-test-loop-go")
+	logger := utils.NewLogger("self-test-loop-go")
 	loop := &Loop{
 		logger:         logger,
 		statusReporter: util.NewStatusReporter(logger),
@@ -34,8 +35,8 @@ type Loop struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	sidekick ldk.Sidekick
-	logger   *ldk.Logger
+	sidekick client.Sidekick
+	logger   *utils.Logger
 
 	testData         TestData
 	statusReporter   *util.StatusReporter
@@ -48,7 +49,7 @@ type TestData struct {
 	file     utils.File
 }
 
-func (loop *Loop) LoopStart(sidekick ldk.Sidekick) error {
+func (loop *Loop) LoopStart(sidekick client.Sidekick) error {
 	loop.sidekick = sidekick
 	loop.ctx, loop.cancel = context.WithCancel(context.Background())
 

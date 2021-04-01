@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"html/template"
 	"os"
@@ -15,7 +17,7 @@ import (
 )
 
 func Serve() error {
-	l := ldk.NewLogger("example-filesystem-listen-directory")
+	l := utils.NewLogger("example-filesystem-listen-directory")
 	loop, err := NewLoop(l)
 	if err != nil {
 		return err
@@ -29,13 +31,13 @@ type Loop struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	sidekick        ldk.Sidekick
-	logger          *ldk.Logger
+	sidekick        client.Sidekick
+	logger          *utils.Logger
 	whisperTemplate *template.Template
 }
 
 // NewLoop returns a pointer to a loop
-func NewLoop(logger *ldk.Logger) (*Loop, error) {
+func NewLoop(logger *utils.Logger) (*Loop, error) {
 	logger.Info("assets", "assetNames", bind.AssetNames())
 	defer logger.Info("new loop created")
 
@@ -56,7 +58,7 @@ func NewLoop(logger *ldk.Logger) (*Loop, error) {
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
-func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
+func (c *Loop) LoopStart(sidekick client.Sidekick) error {
 	c.logger.Info("Starting example controller loop")
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 

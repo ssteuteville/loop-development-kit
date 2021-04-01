@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/open-olive/loop-development-kit/ldk/go/examples/filesystem-file/loop"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -25,7 +24,7 @@ func TestController(t *testing.T) {
 			},
 		},
 	}
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)

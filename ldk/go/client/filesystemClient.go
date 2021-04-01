@@ -1,4 +1,4 @@
-package ldk
+package client
 
 import (
 	"bytes"

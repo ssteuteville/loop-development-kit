@@ -1,4 +1,4 @@
-package ldk
+package client
 
 import "github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 

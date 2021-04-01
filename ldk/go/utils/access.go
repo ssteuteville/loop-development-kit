@@ -1,4 +1,4 @@
-package ldk
+package utils
 
 // Access is a grouping of entity type
 type Access string

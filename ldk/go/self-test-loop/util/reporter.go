@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"os"
 	"sort"
 	"strings"
@@ -27,7 +28,7 @@ type handlerStatus struct {
 	status  string
 }
 
-func NewStatusReporter(logger *ldk.Logger) *StatusReporter {
+func NewStatusReporter(logger *utils.Logger) *StatusReporter {
 	ctx, cancel := context.WithCancel(context.Background())
 	aggregator := make(chan handlerStatus)
 	wiper := make(chan string)
@@ -69,7 +70,7 @@ func (sr *StatusReporter) Stop() {
 	sr.cancel()
 }
 
-func (sr *StatusReporter) worker(logger *ldk.Logger) {
+func (sr *StatusReporter) worker(logger *utils.Logger) {
 	aggregation := make(map[string]string)
 	aggregationMutex := sync.RWMutex{}
 

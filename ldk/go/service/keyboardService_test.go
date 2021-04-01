@@ -1,27 +1,26 @@
-package ldk_test
+package service
 
 import (
-	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 	"reflect"
 	"runtime"
 	"testing"
 )
 
 func TestKeyModifiers(t *testing.T) {
-	type keyFunc func(service.KeyModifier) bool
+	type keyFunc func(KeyModifier) bool
 	funcs := []keyFunc{
-		service.KeyModifier.AltLeft,
-		service.KeyModifier.AltRight,
-		service.KeyModifier.Alt,
-		service.KeyModifier.ControlLeft,
-		service.KeyModifier.ControlRight,
-		service.KeyModifier.Control,
-		service.KeyModifier.MetaLeft,
-		service.KeyModifier.MetaRight,
-		service.KeyModifier.Meta,
-		service.KeyModifier.ShiftLeft,
-		service.KeyModifier.ShiftRight,
-		service.KeyModifier.Shift,
+		KeyModifier.AltLeft,
+		KeyModifier.AltRight,
+		KeyModifier.Alt,
+		KeyModifier.ControlLeft,
+		KeyModifier.ControlRight,
+		KeyModifier.Control,
+		KeyModifier.MetaLeft,
+		KeyModifier.MetaRight,
+		KeyModifier.Meta,
+		KeyModifier.ShiftLeft,
+		KeyModifier.ShiftRight,
+		KeyModifier.Shift,
 	}
 	tests := []struct {
 		name string
@@ -50,11 +49,11 @@ func TestKeyModifiers(t *testing.T) {
 					fnName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 					if i == j {
 						t.Logf("testing %d -> %s", bit, fnName)
-						if !fn(service.KeyModifier(bit)) {
+						if !fn(KeyModifier(bit)) {
 							t.Errorf("%s not detected for %d", test.name, bit)
 						}
 					} else {
-						if fn(service.KeyModifier(bit)) {
+						if fn(KeyModifier(bit)) {
 							t.Errorf("%s should not be detected for %d (%s)", test.name, bit, fnName)
 						}
 					}

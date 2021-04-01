@@ -79,4 +79,4 @@
 // 5. On User disabling the Sensor, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.
 //
 // 6. On Sidekick shutdown, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.
-package ldk
+package utils

@@ -2,6 +2,8 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
@@ -9,7 +11,7 @@ import (
 
 // Serve creates the new loop and tells the LDK to serve it
 func Serve() error {
-	l := ldk.NewLogger("example-search-global")
+	l := utils.NewLogger("example-search-global")
 	loop, err := NewLoop(l)
 	if err != nil {
 		return err
@@ -23,19 +25,19 @@ type Loop struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	sidekick ldk.Sidekick
-	logger   *ldk.Logger
+	sidekick client.Sidekick
+	logger   *utils.Logger
 }
 
 // NewLoop returns a pointer to a loop
-func NewLoop(logger *ldk.Logger) (*Loop, error) {
+func NewLoop(logger *utils.Logger) (*Loop, error) {
 	return &Loop{
 		logger: logger,
 	}, nil
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
-func (l *Loop) LoopStart(sidekick ldk.Sidekick) error {
+func (l *Loop) LoopStart(sidekick client.Sidekick) error {
 	l.logger.Info("starting loop")
 	l.ctx, l.cancel = context.WithCancel(context.Background())
 	l.sidekick = sidekick

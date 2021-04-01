@@ -3,12 +3,12 @@ package loop_test
 import (
 	"context"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/keyboard-character/loop"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -31,7 +31,7 @@ func TestController(t *testing.T) {
 			},
 		},
 	}
-	l := ldk.NewLogger("loop-example")
+	l := utils.NewLogger("loop-example")
 	c, err := loop.NewLoop(l)
 	if err != nil {
 		t.Fatal(err)
