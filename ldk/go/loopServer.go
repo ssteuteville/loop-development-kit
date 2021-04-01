@@ -104,8 +104,3 @@ func (m *LoopServer) LoopStop(_ context.Context, _ *emptypb.Empty) (*emptypb.Emp
 
 	return &emptypb.Empty{}, multiErr
 }
-
-func (m *LoopServer) GetClient(broker *plugin.GRPCBroker, loopClient proto.LoopClient) interface{} {
-	return &LoopClient{Broker: broker, Client: loopClient, S: nil}
-}
-

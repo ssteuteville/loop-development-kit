@@ -22,28 +22,16 @@ type LoopPlugin struct {
 
 // GRPCServer is used to register the controller plugin with the GRPC server
 func (p *LoopPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	//proto.RegisterLoopServer(s, &LoopServer{
-	//	Impl:   p.Impl,
-	//	Broker: broker,
-	//	Logger: p.logger,
-	//})
-	proto.RegisterLoopServer(s, getServer(p, broker))
+	proto.RegisterLoopServer(s, &LoopServer{
+		Impl:   p.Impl,
+		Broker: broker,
+		Logger: p.logger,
+	})
+
 	return nil
 }
 
 // GRPCClient is used to generate controller clients that can be used by the host
 func (p *LoopPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-	//return &server.LoopClient{broker, proto.NewLoopClient(c), nil}, nil
-	return p.loopServer.GetClient(broker, proto.NewLoopClient(c)), nil
-}
-
-func getServer(p *LoopPlugin, broker *plugin.GRPCBroker) *LoopServer {
-	loopServer := &LoopServer{
-		Impl:   p.Impl,
-		Broker: broker,
-		Logger: p.logger,
-	}
-	p.loopServer = loopServer
-
-	return loopServer
+	return &LoopClient{broker, proto.NewLoopClient(c), nil}, nil
 }
