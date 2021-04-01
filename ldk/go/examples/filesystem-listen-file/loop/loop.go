@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"html/template"
 	"time"
 
 	"github.com/dustin/go-humanize"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	"github.com/open-olive/loop-development-kit/ldk/go/examples/filesystem-listen-file/bind"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
 
 func Serve() error {
@@ -118,7 +119,7 @@ func (c *Loop) emitExampleWhisper(fe ldk.FileEvent) error {
 	}
 
 	go func() {
-		err := c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+		err := c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 			Label:    "Example Controller Go",
 			Markdown: markdownBytes.String(),
 		})

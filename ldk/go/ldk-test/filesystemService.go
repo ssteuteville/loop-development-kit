@@ -2,17 +2,17 @@ package ldktest
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"os"
-
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
 
 type FilesystemService struct {
 	Dirf        func(context.Context, string) ([]os.FileInfo, error)
-	ListenDirf  func(context.Context, string, ldk.ListenDirHandler) error
-	ListenFilef func(context.Context, string, ldk.ListenFileHandler) error
-	Openf       func(context.Context, string) (ldk.File, error)
-	Createf     func(context.Context, string) (ldk.File, error)
+	ListenDirf  func(context.Context, string, service.ListenDirHandler) error
+	ListenFilef func(context.Context, string, service.ListenFileHandler) error
+	Openf       func(context.Context, string) (utils.File, error)
+	Createf     func(context.Context, string) (utils.File, error)
 	MakeDirf    func(context.Context, string, uint32) error
 	Copyf       func(context.Context, string, string) error
 	Movef       func(context.Context, string, string) error
@@ -23,19 +23,19 @@ func (f *FilesystemService) Dir(ctx context.Context, dir string) ([]os.FileInfo,
 	return f.Dirf(ctx, dir)
 }
 
-func (f *FilesystemService) ListenDir(ctx context.Context, dir string, handler ldk.ListenDirHandler) error {
+func (f *FilesystemService) ListenDir(ctx context.Context, dir string, handler service.ListenDirHandler) error {
 	return f.ListenDirf(ctx, dir, handler)
 }
 
-func (f *FilesystemService) ListenFile(ctx context.Context, file string, handler ldk.ListenFileHandler) error {
+func (f *FilesystemService) ListenFile(ctx context.Context, file string, handler service.ListenFileHandler) error {
 	return f.ListenFilef(ctx, file, handler)
 }
 
-func (f *FilesystemService) Open(ctx context.Context, name string) (ldk.File, error) {
+func (f *FilesystemService) Open(ctx context.Context, name string) (utils.File, error) {
 	return f.Openf(ctx, name)
 }
 
-func (f *FilesystemService) Create(ctx context.Context, name string) (ldk.File, error) {
+func (f *FilesystemService) Create(ctx context.Context, name string) (utils.File, error) {
 	return f.Createf(ctx, name)
 }
 

@@ -2,6 +2,7 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
@@ -48,7 +49,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 		}
 
 		go func() {
-			err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+			err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "A character from the keyboard: " + string(char),
 			})

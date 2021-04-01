@@ -1,0 +1,3 @@
+package whisper
+
+type WhisperContentListElementType string

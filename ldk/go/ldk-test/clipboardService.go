@@ -2,13 +2,12 @@ package ldktest
 
 import (
 	"context"
-
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 )
 
 type ClipboardService struct {
 	Readf   func(context.Context) (string, error)
-	Listenf func(context.Context, ldk.ClipboardListenConfiguration) error
+	Listenf func(context.Context, service.ClipboardListenConfiguration) error
 	Writef  func(context.Context, string) error
 }
 
@@ -16,7 +15,7 @@ func (c *ClipboardService) Read(ctx context.Context) (string, error) {
 	return c.Readf(ctx)
 }
 
-func (c *ClipboardService) Listen(ctx context.Context, cb ldk.ClipboardListenConfiguration) error {
+func (c *ClipboardService) Listen(ctx context.Context, cb service.ClipboardListenConfiguration) error {
 	return c.Listenf(ctx, cb)
 }
 

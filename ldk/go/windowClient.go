@@ -3,25 +3,28 @@ package ldk
 import (
 	"context"
 	"errors"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"io"
 
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
 )
 
 type WindowClient struct {
-	client  proto.WindowClient
-	session *Session
+	WindowClient proto.WindowClient
+	Session      *server.Session
 }
 
-func (w *WindowClient) ActiveWindow(ctx context.Context) (WindowInfo, error) {
-	resp, err := w.client.WindowActiveWindow(ctx, &proto.WindowActiveWindowRequest{
-		Session: w.session.ToProto(),
+func (w *WindowClient) ActiveWindow(ctx context.Context) (utils.WindowInfo, error) {
+	resp, err := w.WindowClient.WindowActiveWindow(ctx, &proto.WindowActiveWindowRequest{
+		Session: w.Session.ToProto(),
 	})
 	if err != nil {
-		return WindowInfo{}, err
+		return utils.WindowInfo{}, err
 	}
 
-	return WindowInfo{
+	return utils.WindowInfo{
 		Title:  resp.Window.GetTitle(),
 		Path:   resp.Window.GetPath(),
 		PID:    int(resp.Window.GetPid()),
@@ -32,9 +35,9 @@ func (w *WindowClient) ActiveWindow(ctx context.Context) (WindowInfo, error) {
 	}, nil
 }
 
-func (w *WindowClient) ListenActiveWindow(ctx context.Context, handler ListenActiveWindowHandler) error {
-	stream, err := w.client.WindowActiveWindowStream(ctx, &proto.WindowActiveWindowStreamRequest{
-		Session: w.session.ToProto(),
+func (w *WindowClient) ListenActiveWindow(ctx context.Context, handler service.ListenActiveWindowHandler) error {
+	stream, err := w.WindowClient.WindowActiveWindowStream(ctx, &proto.WindowActiveWindowStreamRequest{
+		Session: w.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -47,14 +50,14 @@ func (w *WindowClient) ListenActiveWindow(ctx context.Context, handler ListenAct
 				break
 			}
 			if err != nil {
-				handler(WindowInfo{}, err)
+				handler(utils.WindowInfo{}, err)
 				return
 			}
 
 			if resp.GetError() != "" {
 				err = errors.New(resp.GetError())
 			}
-			handler(WindowInfo{
+			handler(utils.WindowInfo{
 				Title:  resp.Window.GetTitle(),
 				Path:   resp.Window.GetPath(),
 				PID:    int(resp.Window.GetPid()),
@@ -70,18 +73,18 @@ func (w *WindowClient) ListenActiveWindow(ctx context.Context, handler ListenAct
 
 }
 
-func (w *WindowClient) State(ctx context.Context) ([]WindowInfo, error) {
-	resp, err := w.client.WindowState(ctx, &proto.WindowStateRequest{
-		Session: w.session.ToProto(),
+func (w *WindowClient) State(ctx context.Context) ([]utils.WindowInfo, error) {
+	resp, err := w.WindowClient.WindowState(ctx, &proto.WindowStateRequest{
+		Session: w.Session.ToProto(),
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	infos := make([]WindowInfo, len(resp.Window))
+	infos := make([]utils.WindowInfo, len(resp.Window))
 	for _, w := range resp.Window {
-		infos = append(infos, WindowInfo{
+		infos = append(infos, utils.WindowInfo{
 			Title:  w.GetTitle(),
 			Path:   w.GetPath(),
 			PID:    int(w.GetPid()),
@@ -94,9 +97,9 @@ func (w *WindowClient) State(ctx context.Context) ([]WindowInfo, error) {
 	return infos, nil
 }
 
-func (w *WindowClient) ListenState(ctx context.Context, handler ListenWindowStateHandler) error {
-	stream, err := w.client.WindowStateStream(ctx, &proto.WindowStateStreamRequest{
-		Session: w.session.ToProto(),
+func (w *WindowClient) ListenState(ctx context.Context, handler service.ListenWindowStateHandler) error {
+	stream, err := w.WindowClient.WindowStateStream(ctx, &proto.WindowStateStreamRequest{
+		Session: w.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -109,16 +112,16 @@ func (w *WindowClient) ListenState(ctx context.Context, handler ListenWindowStat
 				break
 			}
 			if err != nil {
-				handler(WindowEvent{}, err)
+				handler(utils.WindowEvent{}, err)
 				return
 			}
 
 			if resp.GetError() != "" {
 				err = errors.New(resp.GetError())
 			}
-			we := WindowEvent{
-				Action: protoWindowActionToAction(resp.GetAction()),
-				Window: WindowInfo{
+			we := utils.WindowEvent{
+				Action: utils.ProtoWindowActionToAction(resp.GetAction()),
+				Window: utils.WindowInfo{
 					Title:  resp.Window.GetTitle(),
 					Path:   resp.Window.GetPath(),
 					PID:    int(resp.Window.GetPid()),

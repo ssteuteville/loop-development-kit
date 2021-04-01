@@ -2,6 +2,7 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
@@ -48,7 +49,7 @@ func (l *Loop) LoopStart(sidekick ldk.Sidekick) error {
 		}
 
 		go func() {
-			err = l.sidekick.Whisper().Markdown(l.ctx, &ldk.WhisperContentMarkdown{
+			err = l.sidekick.Whisper().Markdown(l.ctx, &whisper.WhisperContentMarkdown{
 				Label:    "Example Go Loop",
 				Markdown: "Text from the searchbar: " + text,
 			})

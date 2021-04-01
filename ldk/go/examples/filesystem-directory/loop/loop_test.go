@@ -2,13 +2,14 @@ package loop_test
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	"github.com/open-olive/loop-development-kit/ldk/go/examples/filesystem-directory/loop"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
@@ -34,7 +35,7 @@ func TestController(t *testing.T) {
 			},
 		},
 		WhisperService: &ldktest.WhisperService{
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				exp := "# New File Event\n```\nfoo.md\n1.0 kB\n-rwxrwxrwx\nOct  1 02:34:00\nfalse\n```\n\n"
 				if got := w.Markdown; !cmp.Equal(got, exp) {
 					t.Errorf("unexpected markdown:\n%s\n", cmp.Diff(got, exp))

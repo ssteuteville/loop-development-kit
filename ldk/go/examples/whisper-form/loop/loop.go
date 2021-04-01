@@ -3,6 +3,7 @@ package loop
 import (
 	"context"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"regexp"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
@@ -46,25 +47,25 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 }
 
 func (c *Loop) run() {
-	isSubmitted, outputs, err := c.sidekick.Whisper().Form(c.ctx, &ldk.WhisperContentForm{
+	isSubmitted, outputs, err := c.sidekick.Whisper().Form(c.ctx, &whisper.WhisperContentForm{
 		Label:       "Example Controller Go",
 		Markdown:    "Tell us about yourself",
 		CancelLabel: "Cancel",
 		SubmitLabel: "Submit",
-		Inputs: map[string]ldk.WhisperContentFormInput{
-			"name": &ldk.WhisperContentFormInputText{
+		Inputs: map[string]whisper.WhisperContentFormInput{
+			"name": &whisper.WhisperContentFormInputText{
 				Label:   "Full Name",
 				Tooltip: "Your full name.",
 				Order:   1,
 			},
-			"email": &ldk.WhisperContentFormInputText{
+			"email": &whisper.WhisperContentFormInputText{
 				Label:   "Email Address",
 				Tooltip: "Your email address.",
 				Order:   2,
 				OnChange: func(email string) {
 					match, err := regexp.MatchString("^\\S+@\\S+$", email)
 					if err != nil || !match {
-						err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+						err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 							Label:    "Example Controller Go",
 							Markdown: "Invalid Email Address: " + email,
 						})
@@ -73,7 +74,7 @@ func (c *Loop) run() {
 							return
 						}
 					} else {
-						err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+						err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 							Label:    "Example Controller Go",
 							Markdown: "Valid Email Address: " + email,
 						})
@@ -93,11 +94,11 @@ func (c *Loop) run() {
 	c.logger.Debug("got response from confirm whisper", "isSubmitted", isSubmitted)
 
 	var name string
-	if nameOutput := outputs["name"]; nameOutput.Type() == ldk.WhisperContentFormTypeText {
-		name = nameOutput.(*ldk.WhisperContentFormOutputText).Value
+	if nameOutput := outputs["name"]; nameOutput.Type() == whisper.WhisperContentFormTypeText {
+		name = nameOutput.(*whisper.WhisperContentFormOutputText).Value
 	}
 
-	err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+	err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 		Label: "Example Controller Go",
 		Markdown: func() string {
 			if isSubmitted {

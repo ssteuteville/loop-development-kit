@@ -3,6 +3,8 @@ package ldk
 import (
 	"context"
 	"errors"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 	"io"
 
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
@@ -10,17 +12,17 @@ import (
 
 // KeyboardClient is used by the controller plugin to facilitate plugin initiated communication with the host
 type KeyboardClient struct {
-	client  proto.KeyboardClient
-	session *Session
+	KeyboardClient proto.KeyboardClient
+	Session        *server.Session
 }
 
 // ListenHotkey will listen for a specific set of hotkeys and call the handler for each press up or down
-func (k *KeyboardClient) ListenHotkey(ctx context.Context, hotkey Hotkey, handler ListenHotkeyHandler) error {
+func (k *KeyboardClient) ListenHotkey(ctx context.Context, hotkey service.Hotkey, handler service.ListenHotkeyHandler) error {
 	key := &proto.KeyboardHotkey{Key: string(hotkey.Key), Modifiers: int32(hotkey.Modifiers)}
 
-	stream, err := k.client.KeyboardHotkeyStream(ctx, &proto.KeyboardHotkeyStreamRequest{
+	stream, err := k.KeyboardClient.KeyboardHotkeyStream(ctx, &proto.KeyboardHotkeyStreamRequest{
 		Hotkey:  key,
-		Session: k.session.ToProto(),
+		Session: k.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -48,9 +50,9 @@ func (k *KeyboardClient) ListenHotkey(ctx context.Context, hotkey Hotkey, handle
 }
 
 // ListenText will call the handler when a chunk of text has been captured from the keyboard
-func (k *KeyboardClient) ListenText(ctx context.Context, handler ListenTextHandler) error {
-	stream, err := k.client.KeyboardTextStream(ctx, &proto.KeyboardTextStreamRequest{
-		Session: k.session.ToProto(),
+func (k *KeyboardClient) ListenText(ctx context.Context, handler service.ListenTextHandler) error {
+	stream, err := k.KeyboardClient.KeyboardTextStream(ctx, &proto.KeyboardTextStreamRequest{
+		Session: k.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -78,9 +80,9 @@ func (k *KeyboardClient) ListenText(ctx context.Context, handler ListenTextHandl
 }
 
 // ListenCharacter will call the handler for each character typed on the keyboard
-func (k *KeyboardClient) ListenCharacter(ctx context.Context, handler ListenCharacterHandler) error {
-	stream, err := k.client.KeyboardCharacterStream(ctx, &proto.KeyboardCharacterStreamRequest{
-		Session: k.session.ToProto(),
+func (k *KeyboardClient) ListenCharacter(ctx context.Context, handler service.ListenCharacterHandler) error {
+	stream, err := k.KeyboardClient.KeyboardCharacterStream(ctx, &proto.KeyboardCharacterStreamRequest{
+		Session: k.Session.ToProto(),
 	})
 	if err != nil {
 		return err

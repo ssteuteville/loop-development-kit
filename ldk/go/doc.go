@@ -2,7 +2,7 @@
 //
 // The LDK is built with go-plugin (https://github.com/hashicorp/go-plugin), a HashiCorp plugin system used in several of their projects.
 //
-// Plugins developed with this library are executed by Sidekick as separate processes. This ensures that crashes or instability in the plugin will not destabilize the Sidekick process.
+// Plugins developed with this library are executed by Sidekick as separate processes. This ensures that crashes or instability in the plugin will not destabilize the Sidekick ProcessService.
 //
 // Communication between Sidekick and the plugin is first initialized over stdio and then performed using gRPC (https://grpc.io/). On mac and linux the GRPC communication is sent over unix domain socket and on windows over local TCP socket.
 //
@@ -30,17 +30,17 @@
 //
 // Controller Lifecycle
 //
-// 1. Sidekick executes plugin process
+// 1. Sidekick executes plugin ProcessService
 //
 // 2. Sidekick calls `Start`, sending the host connection information to the plugin. This connection information is used to create the `ControllerHost`. The `ControllerHost` interface allows the plugin to emit whispers.
 //
-// 3. On Controller wanting to emit a whisper, the Controller calls the `EmitWhisper` method on the host interface.
+// 3. On Controller wanting to emit a WhisperService, the Controller calls the `EmitWhisper` method on the host interface.
 //
 // 4. On Sensor event, Sidekick calls `OnEvent`, passing the event from the Sensor to the Controller. These events can be ignored or used at the Controller's choice.
 //
-// 5. On User disabling the Controller, Sidekick calls `Stop` then sends `sigterm` to the process.
+// 5. On User disabling the Controller, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.
 //
-// 6. On Sidekick shutdown, Sidekick calls `Stop` then sends `sigterm` to the process.*
+// 6. On Sidekick shutdown, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.*
 //
 // Basic Controller Example
 //
@@ -68,7 +68,7 @@
 //
 // Sensor Lifecycle
 //
-// 1. Sidekick executes plugin process
+// 1. Sidekick executes plugin ProcessService
 //
 // 2. Sidekick calls `Start`, sending the host connection information to the plugin. This connection information is used to create the `SensorHost`. The `SensorHost` interface allows the plugin to emit events.
 //
@@ -76,7 +76,7 @@
 //
 // 4. On Sidekick UI event, Sidekick calls `OnEvent`, passing the event to the Sensor. These events can be ignore or used at the Sensor's choice.
 //
-// 5. On User disabling the Sensor, Sidekick calls `Stop` then sends `sigterm` to the process.
+// 5. On User disabling the Sensor, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.
 //
-// 6. On Sidekick shutdown, Sidekick calls `Stop` then sends `sigterm` to the process.
+// 6. On Sidekick shutdown, Sidekick calls `Stop` then sends `sigterm` to the ProcessService.
 package ldk

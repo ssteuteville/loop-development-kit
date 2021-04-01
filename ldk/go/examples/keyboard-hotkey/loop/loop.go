@@ -3,6 +3,8 @@ package loop
 import (
 	"context"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
@@ -41,7 +43,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 	c.sidekick = sidekick
 
 	// Keyboard Listener 1
-	hotkey := ldk.Hotkey{Key: 'a', Modifiers: ldk.KeyModifierControlLeft}
+	hotkey := service.Hotkey{Key: 'a', Modifiers: service.KeyModifierControlLeft}
 	return sidekick.Keyboard().ListenHotkey(c.ctx, hotkey, func(scanned bool, err error) {
 		c.logger.Info("controller loop callback called")
 		if err != nil {
@@ -49,7 +51,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 			return
 		}
 
-		err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+		err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 			Label:    "Example Controller Go",
 			Markdown: fmt.Sprintf("hotkey: %v, scanned: %t", hotkey, scanned),
 		})

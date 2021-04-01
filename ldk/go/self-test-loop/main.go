@@ -5,8 +5,11 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	"github.com/open-olive/loop-development-kit/ldk/go/self-test-loop/util"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -42,7 +45,7 @@ type Loop struct {
 type TestData struct {
 	dirPath  string
 	filePath string
-	file     ldk.File
+	file     utils.File
 }
 
 func (loop *Loop) LoopStart(sidekick ldk.Sidekick) error {
@@ -142,7 +145,7 @@ func (loop *Loop) listenToKeyboard() error {
 	}
 
 	err = loop.sidekick.Keyboard().ListenHotkey(loop.ctx,
-		ldk.Hotkey{Key: 'a', Modifiers: ldk.KeyModifierControl},
+		service.Hotkey{Key: 'a', Modifiers: service.KeyModifierControl},
 		loop.keyboardHotkeyHandler())
 	if err != nil {
 		loop.logger.Error("keyboard hotkey listen error", err)
@@ -212,7 +215,7 @@ func (loop *Loop) listenToFilesystem() error {
 	return err
 }
 
-func (loop *Loop) clipboardHandler() ldk.ClipboardListenConfiguration {
+func (loop *Loop) clipboardHandler() service.ClipboardListenConfiguration {
 	handler := func(text string, err error) {
 		if err != nil {
 			loop.logger.Error("clipboard callback error", err)
@@ -222,10 +225,10 @@ func (loop *Loop) clipboardHandler() ldk.ClipboardListenConfiguration {
 		loop.statusReporter.Report("clipboard", text)
 	}
 
-	return ldk.ClipboardListenConfiguration{Handler: handler}
+	return service.ClipboardListenConfiguration{Handler: handler}
 }
 
-func (loop *Loop) keyboardTextHandler() ldk.ListenTextHandler {
+func (loop *Loop) keyboardTextHandler() service.ListenTextHandler {
 	return func(text string, err error) {
 		if err != nil {
 			loop.logger.Error("keyboard text callback error", err)
@@ -236,7 +239,7 @@ func (loop *Loop) keyboardTextHandler() ldk.ListenTextHandler {
 	}
 }
 
-func (loop *Loop) keyboardCharacterHandler() ldk.ListenCharacterHandler {
+func (loop *Loop) keyboardCharacterHandler() service.ListenCharacterHandler {
 	return func(char rune, err error) {
 		if err != nil {
 			loop.logger.Error("keyboard character callback error", err)
@@ -247,7 +250,7 @@ func (loop *Loop) keyboardCharacterHandler() ldk.ListenCharacterHandler {
 	}
 }
 
-func (loop *Loop) keyboardHotkeyHandler() ldk.ListenHotkeyHandler {
+func (loop *Loop) keyboardHotkeyHandler() service.ListenHotkeyHandler {
 	return func(scanned bool, err error) {
 		if err != nil {
 			loop.logger.Error("keyboard hotkey callback error", err)
@@ -258,8 +261,8 @@ func (loop *Loop) keyboardHotkeyHandler() ldk.ListenHotkeyHandler {
 	}
 }
 
-func (loop *Loop) cursorPositionHandler() ldk.ListenPositionHandler {
-	return func(position ldk.CursorPosition, err error) {
+func (loop *Loop) cursorPositionHandler() service.ListenPositionHandler {
+	return func(position service.CursorPosition, err error) {
 		if err != nil {
 			loop.logger.Error("cursor position callback error", err)
 			return
@@ -269,8 +272,8 @@ func (loop *Loop) cursorPositionHandler() ldk.ListenPositionHandler {
 	}
 }
 
-func (loop *Loop) activeWindowHandler() ldk.ListenActiveWindowHandler {
-	return func(windowInfo ldk.WindowInfo, err error) {
+func (loop *Loop) activeWindowHandler() service.ListenActiveWindowHandler {
+	return func(windowInfo utils.WindowInfo, err error) {
 		if err != nil {
 			loop.logger.Error("active window callback error", err)
 			return
@@ -280,8 +283,8 @@ func (loop *Loop) activeWindowHandler() ldk.ListenActiveWindowHandler {
 	}
 }
 
-func (loop *Loop) windowStateHandler() ldk.ListenWindowStateHandler {
-	return func(event ldk.WindowEvent, err error) {
+func (loop *Loop) windowStateHandler() service.ListenWindowStateHandler {
+	return func(event utils.WindowEvent, err error) {
 		if err != nil {
 			loop.logger.Error("window state callback error", err)
 			return
@@ -291,7 +294,7 @@ func (loop *Loop) windowStateHandler() ldk.ListenWindowStateHandler {
 	}
 }
 
-func (loop *Loop) globalSearchHandler() ldk.ListenSearchHandler {
+func (loop *Loop) globalSearchHandler() service.ListenSearchHandler {
 	return func(query string, err error) {
 		if err != nil {
 			loop.logger.Error("global search callback error", err)
@@ -302,7 +305,7 @@ func (loop *Loop) globalSearchHandler() ldk.ListenSearchHandler {
 	}
 }
 
-func (loop *Loop) searchbarHandler() ldk.ListenSearchHandler {
+func (loop *Loop) searchbarHandler() service.ListenSearchHandler {
 	return func(query string, err error) {
 		if err != nil {
 			loop.logger.Error("searchbar callback error", err)
@@ -313,8 +316,8 @@ func (loop *Loop) searchbarHandler() ldk.ListenSearchHandler {
 	}
 }
 
-func (loop *Loop) processStateHandler() ldk.ListenProcessStateHandler {
-	return func(event ldk.ProcessEvent, err error) {
+func (loop *Loop) processStateHandler() service.ListenProcessStateHandler {
+	return func(event service.ProcessEvent, err error) {
 		if err != nil {
 			loop.logger.Error("process state callback error", err)
 			return
@@ -324,7 +327,7 @@ func (loop *Loop) processStateHandler() ldk.ListenProcessStateHandler {
 	}
 }
 
-func (loop *Loop) fileHandler() ldk.ListenFileHandler {
+func (loop *Loop) fileHandler() service.ListenFileHandler {
 	return func(event ldk.FileEvent, err error) {
 		if err != nil {
 			loop.logger.Error("file callback error", err)
@@ -335,7 +338,7 @@ func (loop *Loop) fileHandler() ldk.ListenFileHandler {
 	}
 }
 
-func (loop *Loop) dirHandler() ldk.ListenDirHandler {
+func (loop *Loop) dirHandler() service.ListenDirHandler {
 	return func(event ldk.FileEvent, err error) {
 		if err != nil {
 			loop.logger.Error("dir callback error", err)
@@ -436,103 +439,103 @@ func (loop *Loop) emitPlaygroundWhisper(ctx context.Context) {
 				if restarted {
 					loop.logger.Info("RESTARTING PLAYGROUND WHISPER")
 				}
-				_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &ldk.WhisperContentDisambiguation{
+				_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &whisper.WhisperContentDisambiguation{
 					Label: "Actions",
-					Elements: map[string]ldk.WhisperContentDisambiguationElement{
-						"CLEAR_ALL": &ldk.WhisperContentDisambiguationElementOption{
+					Elements: map[string]whisper.WhisperContentDisambiguationElement{
+						"CLEAR_ALL": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "CLEAR ALL",
 							Order:    0,
 							OnChange: onClickClear(loop),
 						},
-						"NETWORK_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"NETWORK_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Network",
 							Order: 1,
 						},
-						"NETWORK_HTTP_REQUEST": &ldk.WhisperContentDisambiguationElementOption{
+						"NETWORK_HTTP_REQUEST": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Network: HTTP Request",
 							Order:    2,
 							OnChange: onClickNetworkHttpRequest(loop),
 						},
-						"CLIPBOARD_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"CLIPBOARD_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Clipboard",
 							Order: 3,
 						},
-						"CLIPBOARD_READ": &ldk.WhisperContentDisambiguationElementOption{
+						"CLIPBOARD_READ": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Clipboard: Read",
 							Order:    4,
 							OnChange: onClickClipboardRead(loop),
 						},
-						"CLIPBOARD_WRITE": &ldk.WhisperContentDisambiguationElementOption{
+						"CLIPBOARD_WRITE": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Clipboard: Write",
 							Order:    5,
 							OnChange: onClickClipboardWrite(loop),
 						},
-						"VAULT_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"VAULT_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Vault",
 							Order: 6,
 						},
-						"VAULT_READ": &ldk.WhisperContentDisambiguationElementOption{
+						"VAULT_READ": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Vault: Read",
 							Order:    7,
 							OnChange: onClickVaultRead(loop),
 						},
-						"VAULT_WRITE": &ldk.WhisperContentDisambiguationElementOption{
+						"VAULT_WRITE": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Vault: Write",
 							Order:    8,
 							OnChange: onClickVaultWrite(loop),
 						},
-						"VAULT_EXISTS": &ldk.WhisperContentDisambiguationElementOption{
+						"VAULT_EXISTS": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Vault: Exists",
 							Order:    9,
 							OnChange: onClickVaultExists(loop),
 						},
-						"VAULT_DELETE": &ldk.WhisperContentDisambiguationElementOption{
+						"VAULT_DELETE": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Vault: Delete",
 							Order:    10,
 							OnChange: onClickVaultDelete(loop),
 						},
-						"WINDOW_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"WINDOW_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Window",
 							Order: 11,
 						},
-						"WINDOW_ACTIVE_WINDOW": &ldk.WhisperContentDisambiguationElementOption{
+						"WINDOW_ACTIVE_WINDOW": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Window: Active Window",
 							Order:    12,
 							OnChange: onClickActiveWindow(loop),
 						},
-						"WINDOW_STATE": &ldk.WhisperContentDisambiguationElementOption{
+						"WINDOW_STATE": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Window: State",
 							Order:    13,
 							OnChange: onClickWindowState(loop),
 						},
-						"PROCESS_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"PROCESS_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Process",
 							Order: 14,
 						},
-						"PROCESS_STATE": &ldk.WhisperContentDisambiguationElementOption{
+						"PROCESS_STATE": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Process: State",
 							Order:    15,
 							OnChange: onClickProcessState(loop),
 						},
-						"CURSOR_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"CURSOR_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Cursor",
 							Order: 16,
 						},
-						"CURSOR_POSITION": &ldk.WhisperContentDisambiguationElementOption{
+						"CURSOR_POSITION": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Cursor: Position",
 							Order:    17,
 							OnChange: onClickCursorPosition(loop),
 						},
-						"UTILITIES_HEADER": &ldk.WhisperContentDisambiguationElementText{
+						"UTILITIES_HEADER": &whisper.WhisperContentDisambiguationElementText{
 							Body:  "Utilities",
 							Order: 18,
 						},
-						"FILESYSTEM": &ldk.WhisperContentDisambiguationElementOption{
+						"FILESYSTEM": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Filesystem (Opens Form Whisper)",
 							Order:    19,
 							OnChange: onClickFilesystem(loop),
 						},
-						"WHISPER": &ldk.WhisperContentDisambiguationElementOption{
+						"WHISPER": &whisper.WhisperContentDisambiguationElementOption{
 							Label:    "Whisper (Opens Disambiguation Whisper)",
 							Order:    20,
 							OnChange: onClickWhisper(loop),
@@ -556,7 +559,7 @@ func onClickClear(loop *Loop) func(string) {
 
 func onClickNetworkHttpRequest(loop *Loop) func(string) {
 	return func(_ string) {
-		response, err := loop.sidekick.Network().HTTPRequest(loop.ctx, &ldk.HTTPRequest{
+		response, err := loop.sidekick.Network().HTTPRequest(loop.ctx, &service.HTTPRequest{
 			URL:    "http://oliveai.com",
 			Method: "GET",
 		})
@@ -694,11 +697,11 @@ func onClickCursorPosition(loop *Loop) func(string) {
 func onClickFilesystem(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
-			_, output, err := loop.sidekick.Whisper().Form(loop.ctx, &ldk.WhisperContentForm{
+			_, output, err := loop.sidekick.Whisper().Form(loop.ctx, &whisper.WhisperContentForm{
 				Label:    "Filesystem Operation Tester",
 				Markdown: "Pair an operation with a target file",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"Operation": &ldk.WhisperContentFormInputSelect{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"Operation": &whisper.WhisperContentFormInputSelect{
 						Label: "Operation",
 						Options: []string{
 							"Dir",
@@ -711,15 +714,15 @@ func onClickFilesystem(loop *Loop) func(string) {
 						},
 						Order: 0,
 					},
-					"Target": &ldk.WhisperContentFormInputText{
+					"Target": &whisper.WhisperContentFormInputText{
 						Label: "Target",
 						Order: 1,
 					},
-					"Destination": &ldk.WhisperContentFormInputText{
+					"Destination": &whisper.WhisperContentFormInputText{
 						Label: "Destination (Optional)",
 						Order: 2,
 					},
-					"Recursive": &ldk.WhisperContentFormInputCheckbox{
+					"Recursive": &whisper.WhisperContentFormInputCheckbox{
 						Label: "Recursive (Optional)",
 						Order: 3,
 					},
@@ -732,12 +735,12 @@ func onClickFilesystem(loop *Loop) func(string) {
 			}
 			loop.statusReporter.Report("onClickFilesystem", output)
 
-			operation, ok := output["Operation"].(*ldk.WhisperContentFormOutputSelect)
+			operation, ok := output["Operation"].(*whisper.WhisperContentFormOutputSelect)
 			if !ok {
 				loop.logger.Info("no operation provided", err)
 				return
 			}
-			target, ok := output["Target"].(*ldk.WhisperContentFormOutputText)
+			target, ok := output["Target"].(*whisper.WhisperContentFormOutputText)
 			if !ok {
 				loop.logger.Info("no target provided", err)
 				return
@@ -771,7 +774,7 @@ func onClickFilesystem(loop *Loop) func(string) {
 				}
 				loop.statusReporter.Report("filesystemTestMakeDir", "OK")
 			case "Copy":
-				destination, ok := output["Destination"].(*ldk.WhisperContentFormOutputText)
+				destination, ok := output["Destination"].(*whisper.WhisperContentFormOutputText)
 				if !ok {
 					loop.logger.Error("filesystem copy error", errors.New("no destination provided"))
 				}
@@ -782,7 +785,7 @@ func onClickFilesystem(loop *Loop) func(string) {
 				}
 				loop.statusReporter.Report("filesystemTestCopy", "OK")
 			case "Move":
-				destination, ok := output["Destination"].(*ldk.WhisperContentFormOutputText)
+				destination, ok := output["Destination"].(*whisper.WhisperContentFormOutputText)
 				if !ok {
 					loop.logger.Error("filesystem move error", errors.New("no destination provided"))
 				}
@@ -793,7 +796,7 @@ func onClickFilesystem(loop *Loop) func(string) {
 				}
 				loop.statusReporter.Report("filesystemTestMove", "OK")
 			case "Remove":
-				recursive, ok := output["Recursive"].(*ldk.WhisperContentFormOutputCheckbox)
+				recursive, ok := output["Recursive"].(*whisper.WhisperContentFormOutputCheckbox)
 				if !ok {
 					loop.logger.Error("filesystem remove error", errors.New("no recursive provided"))
 				}
@@ -811,30 +814,30 @@ func onClickFilesystem(loop *Loop) func(string) {
 func onClickWhisper(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
-			_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &ldk.WhisperContentDisambiguation{
+			_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &whisper.WhisperContentDisambiguation{
 				Label: "Whispers",
-				Elements: map[string]ldk.WhisperContentDisambiguationElement{
-					"CONFIRM": &ldk.WhisperContentDisambiguationElementOption{
+				Elements: map[string]whisper.WhisperContentDisambiguationElement{
+					"CONFIRM": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "Confirm Whisper",
 						Order:    0,
 						OnChange: onClickConfirmWhisper(loop),
 					},
-					"DISAMBIGUATION": &ldk.WhisperContentDisambiguationElementOption{
+					"DISAMBIGUATION": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "Disambiguation Whisper",
 						Order:    1,
 						OnChange: onClickDisambiguationWhisper(loop),
 					},
-					"FORM": &ldk.WhisperContentDisambiguationElementOption{
+					"FORM": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "Form Whisper",
 						Order:    2,
 						OnChange: onClickFormWhisper(loop),
 					},
-					"MARKDOWN": &ldk.WhisperContentDisambiguationElementOption{
+					"MARKDOWN": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "Markdown Whisper",
 						Order:    3,
 						OnChange: onClickMarkdownWhisper(loop),
 					},
-					"LIST": &ldk.WhisperContentDisambiguationElementOption{
+					"LIST": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "List Whisper",
 						Order:    4,
 						OnChange: onClickListWhisper(loop),
@@ -853,7 +856,7 @@ func onClickConfirmWhisper(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
 			// todo: this does not return when the buttons are clicked
-			confirm, err := loop.sidekick.Whisper().Confirm(loop.ctx, &ldk.WhisperContentConfirm{
+			confirm, err := loop.sidekick.Whisper().Confirm(loop.ctx, &whisper.WhisperContentConfirm{
 				Label:        "Confirmation Whisper",
 				Markdown:     "Please **reject** or **resolve**!",
 				RejectLabel:  "Reject",
@@ -874,14 +877,14 @@ func onClickDisambiguationWhisper(loop *Loop) func(string) {
 				loop.statusReporter.Report("onClickDisambiguationWhisperOption", "clicked")
 			}
 
-			_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &ldk.WhisperContentDisambiguation{
+			_, err := loop.sidekick.Whisper().Disambiguation(loop.ctx, &whisper.WhisperContentDisambiguation{
 				Label: "Disambiguation",
-				Elements: map[string]ldk.WhisperContentDisambiguationElement{
-					"TEXT": &ldk.WhisperContentDisambiguationElementText{
+				Elements: map[string]whisper.WhisperContentDisambiguationElement{
+					"TEXT": &whisper.WhisperContentDisambiguationElementText{
 						Body:  "Disambiguation Text Body",
 						Order: 0,
 					},
-					"OPTION": &ldk.WhisperContentDisambiguationElementOption{
+					"OPTION": &whisper.WhisperContentDisambiguationElementOption{
 						Label:    "Report",
 						Order:    1,
 						OnChange: reportClick,
@@ -898,11 +901,11 @@ func onClickDisambiguationWhisper(loop *Loop) func(string) {
 func onClickFormWhisper(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
-			submitted, output, err := loop.sidekick.Whisper().Form(loop.ctx, &ldk.WhisperContentForm{
+			submitted, output, err := loop.sidekick.Whisper().Form(loop.ctx, &whisper.WhisperContentForm{
 				Label:    "Form Whisper",
 				Markdown: "This is a form whisper test.",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"CHECKBOX": &ldk.WhisperContentFormInputCheckbox{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"CHECKBOX": &whisper.WhisperContentFormInputCheckbox{
 						Label: "Checkbox",
 						Value: false,
 						OnChange: func(value bool) {
@@ -910,7 +913,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 0,
 					},
-					"EMAIL": &ldk.WhisperContentFormInputEmail{
+					"EMAIL": &whisper.WhisperContentFormInputEmail{
 						Label: "Email",
 						Value: "test@example.com",
 						OnChange: func(value string) {
@@ -918,7 +921,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 1,
 					},
-					"MARKDOWN": &ldk.WhisperContentFormInputMarkdown{
+					"MARKDOWN": &whisper.WhisperContentFormInputMarkdown{
 						Label: "Markdown",
 						Value: "**Hello** I am *Markdown.*",
 						OnChange: func(value string) {
@@ -926,7 +929,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 2,
 					},
-					"NUMBER": &ldk.WhisperContentFormInputNumber{
+					"NUMBER": &whisper.WhisperContentFormInputNumber{
 						Label: "Number",
 						Min:   0,
 						Max:   9001,
@@ -937,14 +940,14 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						Order: 3,
 					},
 					// todo: password not submitted if you don't wait a few seconds
-					"PASSWORD": &ldk.WhisperContentFormInputPassword{
+					"PASSWORD": &whisper.WhisperContentFormInputPassword{
 						Label: "Password",
 						OnChange: func(value string) {
 							loop.statusReporter.Report("onClickFormWhisperPassword", value)
 						},
 						Order: 4,
 					},
-					"RADIO": &ldk.WhisperContentFormInputRadio{
+					"RADIO": &whisper.WhisperContentFormInputRadio{
 						Label: "Radio",
 						Options: []string{
 							"AM",
@@ -955,7 +958,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 5,
 					},
-					"SELECT": &ldk.WhisperContentFormInputSelect{
+					"SELECT": &whisper.WhisperContentFormInputSelect{
 						Label: "Select",
 						Options: []string{
 							"Red",
@@ -966,7 +969,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 6,
 					},
-					"TEL": &ldk.WhisperContentFormInputTel{
+					"TEL": &whisper.WhisperContentFormInputTel{
 						Label:   "Tel",
 						Pattern: "\\+?1? ?\\(?[0-9]{3}\\)? ?[0-9]{3}-?[0-9]{4}",
 						Value:   "1 (555) 555-5555",
@@ -975,7 +978,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 7,
 					},
-					"TEXT": &ldk.WhisperContentFormInputText{
+					"TEXT": &whisper.WhisperContentFormInputText{
 						Label: "Text",
 						Value: "Text!",
 						OnChange: func(value string) {
@@ -983,7 +986,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 						},
 						Order: 8,
 					},
-					"TIME": &ldk.WhisperContentFormInputTime{
+					"TIME": &whisper.WhisperContentFormInputTime{
 						Label: "Time",
 						Value: time.Now(),
 						OnChange: func(value time.Time) {
@@ -1007,7 +1010,7 @@ func onClickFormWhisper(loop *Loop) func(string) {
 func onClickMarkdownWhisper(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
-			err := loop.sidekick.Whisper().Markdown(loop.ctx, &ldk.WhisperContentMarkdown{
+			err := loop.sidekick.Whisper().Markdown(loop.ctx, &whisper.WhisperContentMarkdown{
 				Label:    "Markdown",
 				Markdown: "**Hello!**  This is some *Markdown.*",
 			})
@@ -1021,36 +1024,36 @@ func onClickMarkdownWhisper(loop *Loop) func(string) {
 func onClickListWhisper(loop *Loop) func(string) {
 	return func(_ string) {
 		go func() {
-			err := loop.sidekick.Whisper().List(loop.ctx, &ldk.WhisperContentList{
+			err := loop.sidekick.Whisper().List(loop.ctx, &whisper.WhisperContentList{
 				Label: "List",
-				Elements: map[string]ldk.WhisperContentListElement{
-					"MESSAGE": &ldk.WhisperContentListElementMessage{
+				Elements: map[string]whisper.WhisperContentListElement{
+					"MESSAGE": &whisper.WhisperContentListElementMessage{
 						Align:  "left",
 						Body:   "Message Element",
 						Extra:  false,
 						Header: "Message Element Header",
 						Order:  0,
-						Style:  ldk.WhisperContentListElementStyleSuccess,
+						Style:  whisper.WhisperContentListElementStyleSuccess,
 					},
-					"DIVIDER": &ldk.WhisperContentListElementDivider{
+					"DIVIDER": &whisper.WhisperContentListElementDivider{
 						Extra: false,
 						Order: 1,
-						Style: ldk.WhisperContentListElementStyleSuccess,
+						Style: whisper.WhisperContentListElementStyleSuccess,
 					},
-					"PAIR": &ldk.WhisperContentListElementPair{
+					"PAIR": &whisper.WhisperContentListElementPair{
 						Copyable: true,
 						Extra:    false,
 						Label:    "Pair Element",
 						Order:    2,
-						Style:    ldk.WhisperContentListElementStyleSuccess,
+						Style:    whisper.WhisperContentListElementStyleSuccess,
 						Value:    "Pair Element Value",
 					},
-					"LINK": &ldk.WhisperContentListElementLink{
+					"LINK": &whisper.WhisperContentListElementLink{
 						Align: "",
 						Extra: true,
 						Href:  "http://oliveai.com",
 						Order: 3,
-						Style: ldk.WhisperContentListElementStyleSuccess,
+						Style: whisper.WhisperContentListElementStyleSuccess,
 						Text:  "Link to Olive AI Website",
 					},
 				},

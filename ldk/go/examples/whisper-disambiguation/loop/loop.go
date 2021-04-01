@@ -3,6 +3,8 @@ package loop
 import (
 	"context"
 	"encoding/json"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/client"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"time"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
@@ -69,7 +71,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 
 	now := time.Now()
 
-	response, err := sidekick.Network().HTTPRequest(c.ctx, &ldk.HTTPRequest{
+	response, err := sidekick.Network().HTTPRequest(c.ctx, &client.HTTPRequest{
 		URL:    "https://api.fda.gov/food/enforcement.json?search=report_date:[" + now.AddDate(0, -3, 0).Format("20060102") + "+TO+" + now.Format("20060102") + "]&limit=10",
 		Method: "GET",
 		Body:   nil,
@@ -87,79 +89,79 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 			return err
 		}
 
-		elements := make(map[string]ldk.WhisperContentDisambiguationElement)
+		elements := make(map[string]whisper.WhisperContentDisambiguationElement)
 
 		for index := range data.Results {
 			item := data.Results[index]
-			elements[item.ID] = &ldk.WhisperContentDisambiguationElementOption{
+			elements[item.ID] = &whisper.WhisperContentDisambiguationElementOption{
 				Label: "😝" + item.Firm + " (" + item.Date + ")",
 				Order: uint32(index) + 1,
 				OnChange: func(key string) {
 					go func() {
-						err := c.sidekick.Whisper().List(c.ctx, &ldk.WhisperContentList{
+						err := c.sidekick.Whisper().List(c.ctx, &whisper.WhisperContentList{
 							Label: item.Firm + " Recall",
-							Elements: map[string]ldk.WhisperContentListElement{
-								"topMessage": &ldk.WhisperContentListElementMessage{
-									Style: ldk.WhisperContentListElementStyleNone,
+							Elements: map[string]whisper.WhisperContentListElement{
+								"topMessage": &whisper.WhisperContentListElementMessage{
+									Style: whisper.WhisperContentListElementStyleNone,
 									Body:  item.Description,
-									Align: ldk.WhisperContentListElementAlignLeft,
+									Align: whisper.WhisperContentListElementAlignLeft,
 									Order: 0,
 								},
-								"sectionDivider": &ldk.WhisperContentListElementDivider{
+								"sectionDivider": &whisper.WhisperContentListElementDivider{
 									Order: 1,
 								},
-								"reason": &ldk.WhisperContentListElementPair{
+								"reason": &whisper.WhisperContentListElementPair{
 									Label: "Reason",
 									Order: 2,
 									Value: item.Reason,
 								},
-								"distribution": &ldk.WhisperContentListElementPair{
+								"distribution": &whisper.WhisperContentListElementPair{
 									Label: "Distribution",
 									Order: 3,
 									Value: item.Distribution,
 								},
-								"quantity": &ldk.WhisperContentListElementPair{
+								"quantity": &whisper.WhisperContentListElementPair{
 									Label: "Quantity",
 									Order: 4,
 									Value: item.Quantity,
 								},
-								"codes": &ldk.WhisperContentListElementPair{
+								"codes": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Codes",
 									Order: 5,
 									Value: item.Codes,
 								},
-								"id": &ldk.WhisperContentListElementPair{
+								"id": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Recall number",
 									Order: 6,
 									Value: item.ID,
 								},
-								"date": &ldk.WhisperContentListElementPair{
+								"date": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Date initiated",
 									Order: 7,
 									Value: item.Date,
 								},
-								"recallType": &ldk.WhisperContentListElementPair{
+								"recallType": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Recall type",
 									Order: 8,
 									Value: item.RecallType,
 								},
-								"type": &ldk.WhisperContentListElementPair{
+								"type": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Product type",
 									Order: 9,
 									Value: item.Type,
 								},
-								"classification": &ldk.WhisperContentListElementPair{
+								"classification": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Classification",
 									Order: 10,
 									Value: item.Classification,
 								},
-								"address": &ldk.WhisperContentListElementPair{
+								"address": &whisper.WhisperContentListElementPair{
 									Extra: true,
 									Label: "Company address",
 									Order: 11,
@@ -175,17 +177,17 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 			}
 		}
 
-		elements["header1"] = &ldk.WhisperContentDisambiguationElementText{
+		elements["header1"] = &whisper.WhisperContentDisambiguationElementText{
 			Body:  "# Text header\n## Text subheader",
 			Order: 0,
 		}
-		elements["header2"] = &ldk.WhisperContentDisambiguationElementText{
+		elements["header2"] = &whisper.WhisperContentDisambiguationElementText{
 			Body:  "# Text header",
 			Order: 6,
 		}
 
 		go func() {
-			_, err := c.sidekick.Whisper().Disambiguation(c.ctx, &ldk.WhisperContentDisambiguation{
+			_, err := c.sidekick.Whisper().Disambiguation(c.ctx, &whisper.WhisperContentDisambiguation{
 				Label:    "Latest FDA Food Recalls",
 				Markdown: "The Latest FDA Food Recalls",
 				Elements: elements,

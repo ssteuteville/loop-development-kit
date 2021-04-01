@@ -2,6 +2,7 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
@@ -44,7 +45,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 }
 
 func (c *Loop) run() {
-	isConfirmed, err := c.sidekick.Whisper().Confirm(c.ctx, &ldk.WhisperContentConfirm{
+	isConfirmed, err := c.sidekick.Whisper().Confirm(c.ctx, &whisper.WhisperContentConfirm{
 		Label:        "Example Controller Go",
 		Markdown:     "Do you like bananas?",
 		RejectLabel:  "Nope",
@@ -56,7 +57,7 @@ func (c *Loop) run() {
 	}
 	c.logger.Debug("got response from confirm whisper", "isConfirmed", isConfirmed)
 
-	err = c.sidekick.Whisper().Markdown(c.ctx, &ldk.WhisperContentMarkdown{
+	err = c.sidekick.Whisper().Markdown(c.ctx, &whisper.WhisperContentMarkdown{
 		Label: "Example Controller Go",
 		Markdown: func() string {
 			if isConfirmed {

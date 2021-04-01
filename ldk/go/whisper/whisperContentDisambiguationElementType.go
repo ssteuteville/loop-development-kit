@@ -1,0 +1,3 @@
+package whisper
+
+type WhisperContentDisambiguationElementType string

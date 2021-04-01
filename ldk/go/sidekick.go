@@ -1,15 +1,17 @@
 package ldk
 
+import "github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+
 // Sidekick is an interface that defines what methods plugins can expect from the host
 type Sidekick interface {
-	Clipboard() ClipboardService
-	Vault() VaultService
-	Whisper() WhisperService
-	Keyboard() KeyboardService
-	Process() ProcessService
-	Cursor() CursorService
-	Filesystem() FilesystemService
-	Window() WindowService
-	UI() UIService
-	Network() NetworkService
+	Clipboard() service.ClipboardService
+	Vault() service.VaultService
+	Whisper() service.WhisperService
+	Keyboard() service.KeyboardService
+	Process() service.ProcessService
+	Cursor() service.CursorService
+	Filesystem() service.FilesystemService
+	Window() service.WindowService
+	UI() service.UIService
+	Network() service.NetworkService
 }

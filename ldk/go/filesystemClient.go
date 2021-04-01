@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/utils"
 	"io"
 	"os"
 	"sync"
@@ -14,15 +17,15 @@ import (
 
 // FilesystemClient is used by the controller plugin to facilitate plugin initiated communication with the host
 type FilesystemClient struct {
-	client  proto.FilesystemClient
-	session *Session
+	FilesystemClient proto.FilesystemClient
+	Session          *server.Session
 }
 
 // Dir list the contents of a directory
 func (f *FilesystemClient) Dir(ctx context.Context, dir string) ([]os.FileInfo, error) {
-	resp, err := f.client.FilesystemDir(ctx, &proto.FilesystemDirRequest{
+	resp, err := f.FilesystemClient.FilesystemDir(ctx, &proto.FilesystemDirRequest{
 		Directory: dir,
-		Session:   f.session.ToProto(),
+		Session:   f.Session.ToProto(),
 	})
 	if err != nil {
 		return nil, err
@@ -36,14 +39,8 @@ func (f *FilesystemClient) Dir(ctx context.Context, dir string) ([]os.FileInfo, 
 		if err != nil {
 			return nil, err
 		}
-		file := &FileInfo{
-			name:    f.GetName(),
-			size:    int(f.GetSize()),
-			mode:    int(f.GetMode()),
-			updated: t,
-			isDir:   f.GetIsDir(),
-		}
-		lfiles = append(lfiles, file)
+		file := utils.NewFileInfo(f.GetName(), int(f.GetMode()), int(f.GetSize()), t, f.GetIsDir())
+		lfiles = append(lfiles, &file)
 
 	}
 
@@ -51,10 +48,10 @@ func (f *FilesystemClient) Dir(ctx context.Context, dir string) ([]os.FileInfo, 
 }
 
 // ListenDir stream any updates to the contents of a directory
-func (f *FilesystemClient) ListenDir(ctx context.Context, dir string, handler ListenDirHandler) error {
-	client, err := f.client.FilesystemDirStream(ctx, &proto.FilesystemDirStreamRequest{
+func (f *FilesystemClient) ListenDir(ctx context.Context, dir string, handler service.ListenDirHandler) error {
+	client, err := f.FilesystemClient.FilesystemDirStream(ctx, &proto.FilesystemDirStreamRequest{
 		Directory: dir,
-		Session:   f.session.ToProto(),
+		Session:   f.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -67,31 +64,25 @@ func (f *FilesystemClient) ListenDir(ctx context.Context, dir string, handler Li
 				break
 			}
 			if err != nil {
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				return
 			}
 
 			if resp.GetError() != "" {
 				err = errors.New(resp.GetError())
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				continue
 			}
 
 			file := resp.GetFile()
 			t, err := ptypes.Timestamp(file.Updated)
 			if err != nil {
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				continue
 			}
 
-			fi := &FileInfo{
-				name:    file.GetName(),
-				size:    int(file.GetSize()),
-				mode:    int(file.GetMode()),
-				updated: t,
-				isDir:   file.GetIsDir(),
-			}
-			handler(FileEvent{Info: fi, Action: protoActionToAction(resp.GetAction())}, err)
+			fi := utils.NewFileInfo(file.GetName(), int(file.GetMode()), int(file.GetSize()), t, file.GetIsDir())
+			handler(utils.FileEvent{Info: &fi, Action: utils.ProtoActionToAction(resp.GetAction())}, err)
 		}
 	}()
 
@@ -99,10 +90,10 @@ func (f *FilesystemClient) ListenDir(ctx context.Context, dir string, handler Li
 }
 
 // ListenFile stream any updates to a file
-func (f *FilesystemClient) ListenFile(ctx context.Context, path string, handler ListenFileHandler) error {
-	client, err := f.client.FilesystemFileInfoStream(ctx, &proto.FilesystemFileInfoStreamRequest{
+func (f *FilesystemClient) ListenFile(ctx context.Context, path string, handler service.ListenFileHandler) error {
+	client, err := f.FilesystemClient.FilesystemFileInfoStream(ctx, &proto.FilesystemFileInfoStreamRequest{
 		Path:    path,
-		Session: f.session.ToProto(),
+		Session: f.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -115,31 +106,25 @@ func (f *FilesystemClient) ListenFile(ctx context.Context, path string, handler 
 				break
 			}
 			if err != nil {
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				return
 			}
 
 			if resp.GetError() != "" {
 				err = errors.New(resp.GetError())
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				continue
 			}
 
 			file := resp.GetFile()
 			t, err := ptypes.Timestamp(file.Updated)
 			if err != nil {
-				handler(FileEvent{}, err)
+				handler(utils.FileEvent{}, err)
 				continue
 			}
 
-			fi := &FileInfo{
-				name:    file.GetName(),
-				size:    int(file.GetSize()),
-				mode:    int(file.GetMode()),
-				updated: t,
-				isDir:   file.GetIsDir(),
-			}
-			handler(FileEvent{Info: fi, Action: protoActionToAction(resp.GetAction())}, err)
+			fi := utils.NewFileInfo(file.GetName(), int(file.GetMode()), int(file.GetSize()), t, file.GetIsDir())
+			handler(utils.FileEvent{Info: &fi, Action: utils.ProtoActionToAction(resp.GetAction())}, err)
 		}
 	}()
 
@@ -403,26 +388,20 @@ func (f *GRPCFile) Stat() (os.FileInfo, error) {
 				if err != nil {
 					return nil, err
 				}
-				fi := &FileInfo{
-					name:    info.GetName(),
-					size:    int(info.GetSize()),
-					mode:    int(info.GetMode()),
-					updated: t,
-					isDir:   info.GetIsDir(),
-				}
+				fi := utils.NewFileInfo(info.GetName(), int(info.GetMode()), int(info.GetSize()), t, info.GetIsDir())
 				if resp.GetStat().GetError() == "" {
-					return fi, nil
+					return &fi, nil
 				}
-				return fi, errors.New(resp.GetStat().GetError())
+				return &fi, errors.New(resp.GetStat().GetError())
 			}
 		}
 	}
 }
 
 // Open something
-func (f *FilesystemClient) Open(ctx context.Context, path string) (File, error) {
+func (f *FilesystemClient) Open(ctx context.Context, path string) (utils.File, error) {
 
-	fileStreamClient, err := f.client.FilesystemFileStream(ctx)
+	fileStreamClient, err := f.FilesystemClient.FilesystemFileStream(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -432,7 +411,7 @@ func (f *FilesystemClient) Open(ctx context.Context, path string) (File, error) 
 	err = fileStreamClient.Send(&proto.FilesystemFileStreamRequest{
 		RequestOneOf: &proto.FilesystemFileStreamRequest_Open_{
 			Open: &proto.FilesystemFileStreamRequest_Open{
-				Session: f.session.ToProto(),
+				Session: f.Session.ToProto(),
 				Path:    path,
 			},
 		},
@@ -444,9 +423,9 @@ func (f *FilesystemClient) Open(ctx context.Context, path string) (File, error) 
 	return GRPCFile, nil
 }
 
-func (f *FilesystemClient) Create(ctx context.Context, path string) (File, error) {
+func (f *FilesystemClient) Create(ctx context.Context, path string) (utils.File, error) {
 
-	fileStreamClient, err := f.client.FilesystemFileStream(ctx)
+	fileStreamClient, err := f.FilesystemClient.FilesystemFileStream(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -456,7 +435,7 @@ func (f *FilesystemClient) Create(ctx context.Context, path string) (File, error
 	err = fileStreamClient.Send(&proto.FilesystemFileStreamRequest{
 		RequestOneOf: &proto.FilesystemFileStreamRequest_Create_{
 			Create: &proto.FilesystemFileStreamRequest_Create{
-				Session: f.session.ToProto(),
+				Session: f.Session.ToProto(),
 				Path:    path,
 			},
 		},
@@ -470,8 +449,8 @@ func (f *FilesystemClient) Create(ctx context.Context, path string) (File, error
 
 // MakeDir create new directory
 func (f *FilesystemClient) MakeDir(ctx context.Context, path string, perm uint32) error {
-	_, err := f.client.FilesystemMakeDir(ctx, &proto.FilesystemMakeDirRequest{
-		Session: f.session.ToProto(),
+	_, err := f.FilesystemClient.FilesystemMakeDir(ctx, &proto.FilesystemMakeDirRequest{
+		Session: f.Session.ToProto(),
 		Path:    path,
 		Perm:    perm,
 	})
@@ -484,8 +463,8 @@ func (f *FilesystemClient) MakeDir(ctx context.Context, path string, perm uint32
 
 // Copy file or directory
 func (f *FilesystemClient) Copy(ctx context.Context, source, dest string) error {
-	_, err := f.client.FilesystemCopy(ctx, &proto.FilesystemCopyRequest{
-		Session: f.session.ToProto(),
+	_, err := f.FilesystemClient.FilesystemCopy(ctx, &proto.FilesystemCopyRequest{
+		Session: f.Session.ToProto(),
 		Source:  source,
 		Dest:    dest,
 	})
@@ -498,8 +477,8 @@ func (f *FilesystemClient) Copy(ctx context.Context, source, dest string) error 
 
 // Move file or directory
 func (f *FilesystemClient) Move(ctx context.Context, source, dest string) error {
-	_, err := f.client.FilesystemMove(ctx, &proto.FilesystemMoveRequest{
-		Session: f.session.ToProto(),
+	_, err := f.FilesystemClient.FilesystemMove(ctx, &proto.FilesystemMoveRequest{
+		Session: f.Session.ToProto(),
 		Source:  source,
 		Dest:    dest,
 	})
@@ -512,8 +491,8 @@ func (f *FilesystemClient) Move(ctx context.Context, source, dest string) error 
 
 // Remove file or directory
 func (f *FilesystemClient) Remove(ctx context.Context, path string, recursive bool) error {
-	_, err := f.client.FilesystemRemove(ctx, &proto.FilesystemRemoveRequest{
-		Session:   f.session.ToProto(),
+	_, err := f.FilesystemClient.FilesystemRemove(ctx, &proto.FilesystemRemoveRequest{
+		Session:   f.Session.ToProto(),
 		Path:      path,
 		Recursive: recursive,
 	})

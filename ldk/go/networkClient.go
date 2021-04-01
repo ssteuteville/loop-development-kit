@@ -2,32 +2,18 @@ package ldk
 
 import (
 	"context"
-
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 )
 
-// NetworkClient is the client used by the NetworkService
+// NetworkClient is the VaultClient used by the NetworkService
 type NetworkClient struct {
-	client  proto.NetworkClient
-	session *Session
+	NetworlClient proto.NetworkClient
+	Session       *server.Session
 }
 
-// HTTPResponse is the structure received from HttpRequest
-type HTTPResponse struct {
-	ResponseCode int
-	Data         []byte
-	Headers      map[string][]string
-}
-
-// HTTPRequest is the structure received from HttpRequest
-type HTTPRequest struct {
-	URL     string
-	Method  string
-	Body    []byte
-	Headers map[string][]string
-}
-
-func (n *NetworkClient) HTTPRequest(ctx context.Context, req *HTTPRequest) (*HTTPResponse, error) {
+func (n *NetworkClient) HTTPRequest(ctx context.Context, req *service.HTTPRequest) (*service.HTTPResponse, error) {
 	reqHeaders := make(map[string]*proto.HTTPHeader)
 
 	for name, values := range req.Headers {
@@ -36,8 +22,8 @@ func (n *NetworkClient) HTTPRequest(ctx context.Context, req *HTTPRequest) (*HTT
 		}
 	}
 
-	resp, err := n.client.HTTPRequest(ctx, &proto.HTTPRequestMsg{
-		Session: n.session.ToProto(),
+	resp, err := n.NetworlClient.HTTPRequest(ctx, &proto.HTTPRequestMsg{
+		Session: n.Session.ToProto(),
 		Url:     req.URL,
 		Method:  req.Method,
 		Body:    req.Body,
@@ -54,7 +40,7 @@ func (n *NetworkClient) HTTPRequest(ctx context.Context, req *HTTPRequest) (*HTT
 		respHeaders[name] = values.Values
 	}
 
-	return &HTTPResponse{
+	return &service.HTTPResponse{
 		ResponseCode: int(resp.ResponseCode),
 		Data:         resp.Data,
 		Headers:      respHeaders,

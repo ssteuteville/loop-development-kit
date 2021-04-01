@@ -2,25 +2,27 @@ package loop_test
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	"github.com/open-olive/loop-development-kit/ldk/go/examples/keyboard-hotkey/loop"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
 func TestController(t *testing.T) {
 	sidekick := &ldktest.Sidekick{
 		KeyboardService: &ldktest.KeyboardService{
-			ListenHotkeyf: func(ctx context.Context, hk ldk.Hotkey, cb ldk.ListenHotkeyHandler) error {
+			ListenHotkeyf: func(ctx context.Context, hk service.Hotkey, cb service.ListenHotkeyHandler) error {
 				cb(true, nil)
 
 				return nil
 			},
 		},
 		WhisperService: &ldktest.WhisperService{
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				exp := "hotkey: {97 8}, scanned: true"
 				if got := w.Markdown; !cmp.Equal(got, exp) {
 					t.Errorf("unexpected markdown:\n%s\n", cmp.Diff(got, exp))

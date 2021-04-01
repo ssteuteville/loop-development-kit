@@ -2,6 +2,8 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"time"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
@@ -40,7 +42,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 
 	c.sidekick = sidekick
 
-	return sidekick.Clipboard().Listen(c.ctx, ldk.ClipboardListenConfiguration{Handler: func(text string, err error) {
+	return sidekick.Clipboard().Listen(c.ctx, service.ClipboardListenConfiguration{Handler: func(text string, err error) {
 		ctx, _ := context.WithTimeout(c.ctx, 5*time.Second)
 		c.logger.Info("controller loop callback called")
 		if err != nil {
@@ -49,7 +51,7 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 		}
 
 		go func() {
-			err = c.sidekick.Whisper().Markdown(ctx, &ldk.WhisperContentMarkdown{
+			err = c.sidekick.Whisper().Markdown(ctx, &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "Text from the clipboard: " + text,
 			})

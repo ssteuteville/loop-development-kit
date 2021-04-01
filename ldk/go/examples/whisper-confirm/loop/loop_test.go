@@ -4,19 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/whisper-confirm/loop"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
 func TestWhisperConfirmResolved(t *testing.T) {
 	type confirmRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentConfirm
+		w   *whisper.WhisperContentConfirm
 	}
 	type confirmResponse struct {
 		resolved bool
@@ -24,17 +25,17 @@ func TestWhisperConfirmResolved(t *testing.T) {
 	}
 	confirmRequestChan := make(chan confirmRequest)
 	confirmResponseChan := make(chan confirmResponse)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Confirmf: func(ctx context.Context, w *ldk.WhisperContentConfirm) (bool, error) {
+			Confirmf: func(ctx context.Context, w *whisper.WhisperContentConfirm) (bool, error) {
 				confirmRequestChan <- confirmRequest{ctx, w}
 				res := <-confirmResponseChan
 				return res.resolved, res.err
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				markdownRequestChan <- w
 				err := <-markdownResponseChan
 				return err
@@ -65,7 +66,7 @@ func TestWhisperConfirmResolved(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-confirmRequestChan:
-			exp := &ldk.WhisperContentConfirm{
+			exp := &whisper.WhisperContentConfirm{
 				Label:        "Example Controller Go",
 				Markdown:     "Do you like bananas?",
 				RejectLabel:  "Nope",
@@ -107,7 +108,7 @@ func TestWhisperConfirmResolved(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "That's great!",
 			}
@@ -140,7 +141,7 @@ func TestWhisperConfirmResolved(t *testing.T) {
 func TestWhisperConfirmRejected(t *testing.T) {
 	type confirmRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentConfirm
+		w   *whisper.WhisperContentConfirm
 	}
 	type confirmResponse struct {
 		resolved bool
@@ -148,12 +149,12 @@ func TestWhisperConfirmRejected(t *testing.T) {
 	}
 	confirmRequestChan := make(chan confirmRequest)
 	confirmResponseChan := make(chan confirmResponse)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Confirmf: func(ctx context.Context, w *ldk.WhisperContentConfirm) (bool, error) {
+			Confirmf: func(ctx context.Context, w *whisper.WhisperContentConfirm) (bool, error) {
 				t.Logf("Confirmf request received")
 				confirmRequestChan <- confirmRequest{ctx, w}
 				t.Logf("Confirmf request relayed")
@@ -162,7 +163,7 @@ func TestWhisperConfirmRejected(t *testing.T) {
 				defer t.Logf("Confirmf response sent")
 				return res.resolved, res.err
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				t.Logf("Markdownf request received")
 				markdownRequestChan <- w
 				t.Logf("Markdownf request relayed")
@@ -210,7 +211,7 @@ func TestWhisperConfirmRejected(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-confirmRequestChan:
-			exp := &ldk.WhisperContentConfirm{
+			exp := &whisper.WhisperContentConfirm{
 				Label:        "Example Controller Go",
 				Markdown:     "Do you like bananas?",
 				RejectLabel:  "Nope",
@@ -252,7 +253,7 @@ func TestWhisperConfirmRejected(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "That's too bad.",
 			}

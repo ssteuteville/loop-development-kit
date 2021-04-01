@@ -2,19 +2,20 @@ package loop_test
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/whisper-markdown/loop"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
 func TestController(t *testing.T) {
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
-				exp := &ldk.WhisperContentMarkdown{
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
+				exp := &whisper.WhisperContentMarkdown{
 					Label:    "Example Controller Go",
 					Markdown: "## MARKDOWN!",
 				}

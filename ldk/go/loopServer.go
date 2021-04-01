@@ -2,10 +2,10 @@ package ldk
 
 import (
 	"context"
-
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-plugin"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -14,21 +14,21 @@ import (
 type LoopServer struct {
 	Impl Loop
 
-	broker *plugin.GRPCBroker
-	conn   *grpc.ClientConn
-	logger *Logger
+	Broker *plugin.GRPCBroker
+	Conn   *grpc.ClientConn
+	Logger *Logger
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
 func (m *LoopServer) LoopStart(_ context.Context, req *proto.LoopStartRequest) (*emptypb.Empty, error) {
-	session, err := NewSessionFromProto(req.Session)
+	session, err := server.NewSessionFromProto(req.Session)
 	if err != nil {
 		return nil, err
 	}
 
 	hosts := req.ServiceHosts
 
-	m.conn, err = m.broker.Dial(hosts.HostBrokerId)
+	m.Conn, err = m.Broker.Dial(hosts.HostBrokerId)
 	if err != nil {
 		println("[ERROR] loopServer.go - conn Error")
 		println("[ERROR]" + err.Error())
@@ -36,50 +36,50 @@ func (m *LoopServer) LoopStart(_ context.Context, req *proto.LoopStartRequest) (
 	}
 
 	eli := &ExceptionLoggingInterceptor{
-		interceptedConn: m.conn,
-		logger:          m.logger,
+		InterceptedConn: m.Conn,
+		Logger:          m.Logger,
 	}
 
 	sidekickClient := &SidekickClient{
-		vault: &VaultClient{
-			client:  proto.NewVaultClient(eli),
-			session: session,
+		VaultService: &VaultClient{
+			VaultClient:  proto.NewVaultClient(eli),
+			Session: session,
 		},
-		whisper: &WhisperClient{
-			client:  proto.NewWhisperClient(eli),
-			session: session,
+		WhisperService: &WhisperClient{
+			WhisperClient:  proto.NewWhisperClient(eli),
+			Session: session,
 		},
-		clipboard: &ClipboardClient{
-			client:  proto.NewClipboardClient(eli),
-			session: session,
+		ClipboardService: &ClipboardClient{
+			ClipboardClient:  proto.NewClipboardClient(eli),
+			Session: session,
 		},
-		keyboard: &KeyboardClient{
-			client:  proto.NewKeyboardClient(eli),
-			session: session,
+		KeyboardService: &KeyboardClient{
+			KeyboardClient:  proto.NewKeyboardClient(eli),
+			Session: session,
 		},
-		process: &ProcessClient{
-			client:  proto.NewProcessClient(eli),
-			session: session,
+		ProcessService: &ProcessClient{
+			ProcessClient:  proto.NewProcessClient(eli),
+			Session: session,
 		},
-		cursor: &CursorClient{
-			client:  proto.NewCursorClient(eli),
-			session: session,
+		CursorService: &CursorClient{
+			CursorClient:  proto.NewCursorClient(eli),
+			Session: session,
 		},
-		filesystem: &FilesystemClient{
-			client:  proto.NewFilesystemClient(eli),
-			session: session,
+		FilesystemService: &FilesystemClient{
+			FilesystemClient:  proto.NewFilesystemClient(eli),
+			Session: session,
 		},
-		ui: &UIClient{
-			client:  proto.NewUIClient(eli),
-			session: session,
+		UiService: &UIClient{
+			UiClient:  proto.NewUIClient(eli),
+			Session: session,
 		},
-		network: &NetworkClient{
-			client:  proto.NewNetworkClient(eli),
-			session: session,
+		NetworkService: &NetworkClient{
+			NetworlClient:  proto.NewNetworkClient(eli),
+			Session: session,
 		},
-		window: &WindowClient{
-			client:  proto.NewWindowClient(eli),
-			session: session,
+		WindowService: &WindowClient{
+			WindowClient:  proto.NewWindowClient(eli),
+			Session: session,
 		},
 	}
 	println("[INFO] loopServer.go - LoopStart complete")
@@ -98,9 +98,14 @@ func (m *LoopServer) LoopStop(_ context.Context, _ *emptypb.Empty) (*emptypb.Emp
 	}
 
 	// close service connection
-	if err := m.conn.Close(); err != nil {
+	if err := m.Conn.Close(); err != nil {
 		multiErr = multierror.Append(multiErr, err)
 	}
 
 	return &emptypb.Empty{}, multiErr
 }
+
+func (m *LoopServer) GetClient(broker *plugin.GRPCBroker, loopClient proto.LoopClient) interface{} {
+	return &LoopClient{Broker: broker, Client: loopClient, S: nil}
+}
+

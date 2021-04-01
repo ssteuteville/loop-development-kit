@@ -3,21 +3,22 @@ package ldk
 import (
 	"context"
 	"errors"
-	"io"
-
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
+	"io"
 )
 
 // ClipboardClient is used by loops to facilitate communication with the clipboard service
 type ClipboardClient struct {
-	client  proto.ClipboardClient
-	session *Session
+	ClipboardClient proto.ClipboardClient
+	Session         *server.Session
 }
 
 // Read is used by the loop to get the current clipboard text
 func (c *ClipboardClient) Read(ctx context.Context) (string, error) {
-	resp, err := c.client.ClipboardRead(ctx, &proto.ClipboardReadRequest{
-		Session: c.session.ToProto(),
+	resp, err := c.ClipboardClient.ClipboardRead(ctx, &proto.ClipboardReadRequest{
+		Session: c.Session.ToProto(),
 	})
 	if err != nil {
 		return "", err
@@ -27,9 +28,9 @@ func (c *ClipboardClient) Read(ctx context.Context) (string, error) {
 }
 
 // Listen is used by the loop to establish a stream for handling clipboard changes
-func (c *ClipboardClient) Listen(ctx context.Context, clipboardListenConfigurations ClipboardListenConfiguration) error {
-	stream, err := c.client.ClipboardReadStream(ctx, &proto.ClipboardReadStreamRequest{
-		Session: c.session.ToProto(),
+func (c *ClipboardClient) Listen(ctx context.Context, clipboardListenConfigurations service.ClipboardListenConfiguration) error {
+	stream, err := c.ClipboardClient.ClipboardReadStream(ctx, &proto.ClipboardReadStreamRequest{
+		Session: c.Session.ToProto(),
 	})
 	if err != nil {
 		return err
@@ -58,8 +59,8 @@ func (c *ClipboardClient) Listen(ctx context.Context, clipboardListenConfigurati
 
 // Write is used by the loop to write text to the clipboard
 func (c *ClipboardClient) Write(ctx context.Context, text string) error {
-	_, err := c.client.ClipboardWrite(ctx, &proto.ClipboardWriteRequest{
-		Session: c.session.ToProto(),
+	_, err := c.ClipboardClient.ClipboardWrite(ctx, &proto.ClipboardWriteRequest{
+		Session: c.Session.ToProto(),
 		Text:    text,
 	})
 	if err != nil {

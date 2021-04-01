@@ -3,6 +3,8 @@ package ldk
 import (
 	"context"
 	"errors"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 	"io"
 
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
@@ -10,14 +12,14 @@ import (
 
 // UIClient is used to hook into UI events such as listening to search controls.
 type UIClient struct {
-	client  proto.UIClient
-	session *Session
+	UiClient proto.UIClient
+	Session  *server.Session
 }
 
 // ListenSearchbar allows you to listen to searchbar events.
-func (u *UIClient) ListenSearchbar(ctx context.Context, handler ListenSearchHandler) error {
-	msg := &proto.SearchbarStreamRequest{Session: u.session.ToProto()}
-	client, err := u.client.SearchbarStream(ctx, msg)
+func (u *UIClient) ListenSearchbar(ctx context.Context, handler service.ListenSearchHandler) error {
+	msg := &proto.SearchbarStreamRequest{Session: u.Session.ToProto()}
+	client, err := u.UiClient.SearchbarStream(ctx, msg)
 	if err != nil {
 		return err
 	}
@@ -44,9 +46,9 @@ func (u *UIClient) ListenSearchbar(ctx context.Context, handler ListenSearchHand
 }
 
 // ListenGlobalSearch allows you to listen to global search (omnibar) events.
-func (u *UIClient) ListenGlobalSearch(ctx context.Context, handler ListenSearchHandler) error {
-	msg := &proto.GlobalSearchStreamRequest{Session: u.session.ToProto()}
-	client, err := u.client.GlobalSearchStream(ctx, msg)
+func (u *UIClient) ListenGlobalSearch(ctx context.Context, handler service.ListenSearchHandler) error {
+	msg := &proto.GlobalSearchStreamRequest{Session: u.Session.ToProto()}
+	client, err := u.UiClient.GlobalSearchStream(ctx, msg)
 	if err != nil {
 		return err
 	}

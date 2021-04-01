@@ -3,56 +3,56 @@ package ldk
 import (
 	"context"
 	"fmt"
-
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-plugin"
 	"github.com/open-olive/loop-development-kit/ldk/go/v2/proto"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/server"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // LoopClient is used by the controller plugin host to facilitate host initiated communication with controller plugins
 type LoopClient struct {
-	broker *plugin.GRPCBroker
-	client proto.LoopClient
-	s      *grpc.Server
+	Broker *plugin.GRPCBroker
+	Client proto.LoopClient
+	S      *grpc.Server
 }
 
 // LoopStart is called by the host when the plugin is started to provide access to the host process
-func (m *LoopClient) LoopStart(ctx context.Context, host Sidekick, session *Session) error {
+func (m *LoopClient) LoopStart(ctx context.Context, host Sidekick, session *server.Session) error {
 	// setup service servers
-	clipboardHostServer := &ClipboardServer{Impl: host.Clipboard()}
-	cursorHostServer := &CursorServer{Impl: host.Cursor()}
-	filesystemHostServer := &FilesystemServer{Impl: host.Filesystem()}
-	keyboardHostServer := &KeyboardServer{Impl: host.Keyboard()}
-	networkHostServer := &NetworkServer{Impl: host.Network()}
-	processHostServer := &ProcessServer{Impl: host.Process()}
-	vaultHostServer := &VaultServer{Impl: host.Vault()}
-	uiHostServer := &UIServer{Impl: host.UI()}
-	whisperHostServer := &WhisperServer{Impl: host.Whisper()}
-	windowHostServer := &WindowServer{Impl: host.Window()}
+	clipboardHostServer := &server.ClipboardServer{Impl: host.Clipboard()}
+	cursorHostServer := &server.CursorServer{Impl: host.Cursor()}
+	filesystemHostServer := &server.FilesystemServer{Impl: host.Filesystem()}
+	keyboardHostServer := &server.KeyboardServer{Impl: host.Keyboard()}
+	networkHostServer := &server.NetworkServer{Impl: host.Network()}
+	processHostServer := &server.ProcessServer{Impl: host.Process()}
+	vaultHostServer := &server.VaultServer{Impl: host.Vault()}
+	uiHostServer := &server.UIServer{Impl: host.UI()}
+	whisperHostServer := &server.WhisperServer{Impl: host.Whisper()}
+	windowHostServer := &server.WindowServer{Impl: host.Window()}
 
-	brokerID := m.broker.NextId()
+	brokerID := m.Broker.NextId()
 
 	readyChan := make(chan bool)
 
 	serverFunc := func(opts []grpc.ServerOption) *grpc.Server {
-		m.s = grpc.NewServer(opts...)
-		proto.RegisterClipboardServer(m.s, clipboardHostServer)
-		proto.RegisterCursorServer(m.s, cursorHostServer)
-		proto.RegisterFilesystemServer(m.s, filesystemHostServer)
-		proto.RegisterKeyboardServer(m.s, keyboardHostServer)
-		proto.RegisterNetworkServer(m.s, networkHostServer)
-		proto.RegisterProcessServer(m.s, processHostServer)
-		proto.RegisterVaultServer(m.s, vaultHostServer)
-		proto.RegisterUIServer(m.s, uiHostServer)
-		proto.RegisterWhisperServer(m.s, whisperHostServer)
-		proto.RegisterWindowServer(m.s, windowHostServer)
+		m.S = grpc.NewServer(opts...)
+		proto.RegisterClipboardServer(m.S, clipboardHostServer)
+		proto.RegisterCursorServer(m.S, cursorHostServer)
+		proto.RegisterFilesystemServer(m.S, filesystemHostServer)
+		proto.RegisterKeyboardServer(m.S, keyboardHostServer)
+		proto.RegisterNetworkServer(m.S, networkHostServer)
+		proto.RegisterProcessServer(m.S, processHostServer)
+		proto.RegisterVaultServer(m.S, vaultHostServer)
+		proto.RegisterUIServer(m.S, uiHostServer)
+		proto.RegisterWhisperServer(m.S, whisperHostServer)
+		proto.RegisterWindowServer(m.S, windowHostServer)
 		readyChan <- true
-		return m.s
+		return m.S
 	}
 
-	go m.broker.AcceptAndServe(brokerID, serverFunc)
+	go m.Broker.AcceptAndServe(brokerID, serverFunc)
 
 	select {
 	case <-ctx.Done():
@@ -63,7 +63,7 @@ func (m *LoopClient) LoopStart(ctx context.Context, host Sidekick, session *Sess
 	serviceHosts := &proto.ServiceHosts{
 		HostBrokerId: brokerID,
 	}
-	_, err := m.client.LoopStart(ctx, &proto.LoopStartRequest{
+	_, err := m.Client.LoopStart(ctx, &proto.LoopStartRequest{
 		ServiceHosts: serviceHosts,
 		Session:      session.ToProto(),
 	})
@@ -78,12 +78,12 @@ func (m *LoopClient) LoopStart(ctx context.Context, host Sidekick, session *Sess
 func (m *LoopClient) LoopStop(ctx context.Context) error {
 	var multiErr error
 
-	_, err := m.client.LoopStop(ctx, &emptypb.Empty{})
+	_, err := m.Client.LoopStop(ctx, &emptypb.Empty{})
 	if err != nil {
 		multiErr = multierror.Append(multiErr, err)
 	}
 
-	m.s.Stop()
+	m.S.Stop()
 
 	return multiErr
 }

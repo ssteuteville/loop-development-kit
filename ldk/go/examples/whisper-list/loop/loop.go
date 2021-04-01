@@ -2,6 +2,7 @@ package loop
 
 import (
 	"context"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 
 	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 )
@@ -39,124 +40,124 @@ func (c *Loop) LoopStart(sidekick ldk.Sidekick) error {
 	c.sidekick = sidekick
 
 	go func() {
-		err := c.sidekick.Whisper().List(c.ctx, &ldk.WhisperContentList{
+		err := c.sidekick.Whisper().List(c.ctx, &whisper.WhisperContentList{
 			Label:    "MCMG Location",
 			Markdown: "",
-			Elements: map[string]ldk.WhisperContentListElement{
-				"topMessage": &ldk.WhisperContentListElementMessage{
-					Style:  ldk.WhisperContentListElementStyleNone,
+			Elements: map[string]whisper.WhisperContentListElement{
+				"topMessage": &whisper.WhisperContentListElementMessage{
+					Style:  whisper.WhisperContentListElementStyleNone,
 					Header: "Hello World, I am a subitle",
 					Body:   "This is what body copy looks like. Just a bit, don’t overdo it!",
-					Align:  ldk.WhisperContentListElementAlignLeft,
+					Align:  whisper.WhisperContentListElementAlignLeft,
 					Order:  0,
 				},
-				"successMessage": &ldk.WhisperContentListElementMessage{
-					Align:  ldk.WhisperContentListElementAlignCenter,
+				"successMessage": &whisper.WhisperContentListElementMessage{
+					Align:  whisper.WhisperContentListElementAlignCenter,
 					Header: "This is an alert message!",
 					Body:   "It should be highlighted green.",
-					Style:  ldk.WhisperContentListElementStyleSuccess,
+					Style:  whisper.WhisperContentListElementStyleSuccess,
 					Order:  1,
 				},
-				"sectionDivider": &ldk.WhisperContentListElementDivider{
+				"sectionDivider": &whisper.WhisperContentListElementDivider{
 					Order: 2,
 				},
-				"sectionTitle": &ldk.WhisperContentListElementMessage{
-					Style:  ldk.WhisperContentListElementStyleNone,
+				"sectionTitle": &whisper.WhisperContentListElementMessage{
+					Style:  whisper.WhisperContentListElementStyleNone,
 					Header: "Let’s set the table",
-					Align:  ldk.WhisperContentListElementAlignCenter,
+					Align:  whisper.WhisperContentListElementAlignCenter,
 					Order:  3,
 				},
-				"name": &ldk.WhisperContentListElementPair{
+				"name": &whisper.WhisperContentListElementPair{
 					Label: "Name",
 					Order: 4,
 					Value: "David Simon MD",
 				},
-				"shoeSize": &ldk.WhisperContentListElementPair{
+				"shoeSize": &whisper.WhisperContentListElementPair{
 					Label: "Shoe Size",
 					Order: 5,
 					Value: "38",
 				},
-				"birthDate": &ldk.WhisperContentListElementPair{
-					Style: ldk.WhisperContentListElementStyleWarning,
+				"birthDate": &whisper.WhisperContentListElementPair{
+					Style: whisper.WhisperContentListElementStyleWarning,
 					Label: "Birth Date",
 					Order: 6,
 					Value: "Feb 30th, 1999",
 				},
-				"favoriteColor": &ldk.WhisperContentListElementPair{
+				"favoriteColor": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "FavoriteColor",
 					Order: 7,
 					Value: "Greige",
 				},
-				"favoriteAnimal": &ldk.WhisperContentListElementPair{
+				"favoriteAnimal": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Dogs or Cats",
 					Order: 8,
 					Value: "Bats",
 				},
-				"streetName": &ldk.WhisperContentListElementPair{
+				"streetName": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Street Name",
 					Order: 9,
 					Value: "Main Street",
 				},
-				"zipCode": &ldk.WhisperContentListElementPair{
+				"zipCode": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Zip Code",
 					Order: 10,
 					Value: "10000",
 				},
-				"city": &ldk.WhisperContentListElementPair{
+				"city": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "City",
 					Order: 11,
 					Value: "Townsville",
 				},
-				"phone": &ldk.WhisperContentListElementPair{
+				"phone": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Phone",
 					Order: 12,
 					Value: "123-456-7890",
 				},
-				"favoriteCondiment": &ldk.WhisperContentListElementPair{
-					Style: ldk.WhisperContentListElementStyleWarning,
+				"favoriteCondiment": &whisper.WhisperContentListElementPair{
+					Style: whisper.WhisperContentListElementStyleWarning,
 					Extra: true,
 					Label: "Favorite Condiment",
 					Order: 13,
 					Value: "Pizza",
 				},
-				"100MeterDashTime": &ldk.WhisperContentListElementPair{
+				"100MeterDashTime": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "100m Dash Time",
 					Order: 14,
 					Value: "4 minutes",
 				},
-				"nickname": &ldk.WhisperContentListElementPair{
+				"nickname": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Nickname",
 					Order: 15,
 					Value: "Old Greg",
 				},
-				"notes": &ldk.WhisperContentListElementPair{
+				"notes": &whisper.WhisperContentListElementPair{
 					Extra: true,
 					Label: "Notes",
 					Order: 16,
 					Value: "Lorem ipsum sit amet dolor why does this always feel like a decree by the ancient Romans? It’s just filler text.",
 				},
-				"failureMessage": &ldk.WhisperContentListElementMessage{
-					Align:  ldk.WhisperContentListElementAlignCenter,
+				"failureMessage": &whisper.WhisperContentListElementMessage{
+					Align:  whisper.WhisperContentListElementAlignCenter,
 					Body:   "It should be highlighted red.",
 					Extra:  true,
 					Header: "This is an alert message!",
 					Order:  17,
-					Style:  ldk.WhisperContentListElementStyleError,
+					Style:  whisper.WhisperContentListElementStyleError,
 				},
-				"link": &ldk.WhisperContentListElementLink{
-					Align: ldk.WhisperContentListElementAlignCenter,
+				"link": &whisper.WhisperContentListElementLink{
+					Align: whisper.WhisperContentListElementAlignCenter,
 					Extra: true,
 					Href:  "https://isitchristmas.com/",
 					Order: 18,
-					Style: ldk.WhisperContentListElementStyleNone,
+					Style: whisper.WhisperContentListElementStyleNone,
 					Text:  "IsItChristmas.com",
 				},
 			},

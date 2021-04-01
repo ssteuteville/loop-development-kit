@@ -4,39 +4,40 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/whisper"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	loop "github.com/open-olive/loop-development-kit/ldk/go/examples/whisper-form/loop"
+	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
 	ldktest "github.com/open-olive/loop-development-kit/ldk/go/v2/ldk-test"
 )
 
 func TestWhisperFormResolved(t *testing.T) {
 	type formRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentForm
+		w   *whisper.WhisperContentForm
 	}
 	type formResponse struct {
 		submitted bool
-		outputs   map[string]ldk.WhisperContentFormOutput
+		outputs   map[string]whisper.WhisperContentFormOutput
 		err       error
 	}
 	formRequestChan := make(chan formRequest)
 	formResponseChan := make(chan formResponse)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Formf: func(ctx context.Context, w *ldk.WhisperContentForm) (bool, map[string]ldk.WhisperContentFormOutput, error) {
+			Formf: func(ctx context.Context, w *whisper.WhisperContentForm) (bool, map[string]whisper.WhisperContentFormOutput, error) {
 				formRequestChan <- formRequest{ctx, w}
 				res := <-formResponseChan
 				return res.submitted, res.outputs, res.err
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				markdownRequestChan <- w
 				err := <-markdownResponseChan
 				return err
@@ -67,18 +68,18 @@ func TestWhisperFormResolved(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-formRequestChan:
-			exp := &ldk.WhisperContentForm{
+			exp := &whisper.WhisperContentForm{
 				Label:       "Example Controller Go",
 				Markdown:    "Tell us about yourself",
 				CancelLabel: "Cancel",
 				SubmitLabel: "Submit",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"name": &ldk.WhisperContentFormInputText{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"name": &whisper.WhisperContentFormInputText{
 						Label:   "Full Name",
 						Tooltip: "Your full name.",
 						Order:   1,
 					},
-					"email": &ldk.WhisperContentFormInputText{
+					"email": &whisper.WhisperContentFormInputText{
 						Label:   "Email Address",
 						Tooltip: "Your email address.",
 						Order:   2,
@@ -86,7 +87,7 @@ func TestWhisperFormResolved(t *testing.T) {
 				},
 			}
 			if got := req.w; !cmp.Equal(got, exp,
-				cmpopts.IgnoreFields(ldk.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
+				cmpopts.IgnoreFields(whisper.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
 			) {
 				return fmt.Errorf("unexpected markdown:\n%s", cmp.Diff(got, exp))
 			}
@@ -106,8 +107,8 @@ func TestWhisperFormResolved(t *testing.T) {
 			return errors.New("timeout")
 		case formResponseChan <- formResponse{
 			submitted: true,
-			outputs: map[string]ldk.WhisperContentFormOutput{
-				"name": &ldk.WhisperContentFormOutputText{
+			outputs: map[string]whisper.WhisperContentFormOutput{
+				"name": &whisper.WhisperContentFormOutputText{
 					Value: "Testy McTesterson",
 				},
 			},
@@ -128,7 +129,7 @@ func TestWhisperFormResolved(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "Hello Testy McTesterson",
 			}
@@ -161,21 +162,21 @@ func TestWhisperFormResolved(t *testing.T) {
 func TestWhisperFormRejected(t *testing.T) {
 	type formRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentForm
+		w   *whisper.WhisperContentForm
 	}
 	type formResponse struct {
 		submitted bool
-		outputs   map[string]ldk.WhisperContentFormOutput
+		outputs   map[string]whisper.WhisperContentFormOutput
 		err       error
 	}
 	formRequestChan := make(chan formRequest)
 	formResponseChan := make(chan formResponse)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Formf: func(ctx context.Context, w *ldk.WhisperContentForm) (bool, map[string]ldk.WhisperContentFormOutput, error) {
+			Formf: func(ctx context.Context, w *whisper.WhisperContentForm) (bool, map[string]whisper.WhisperContentFormOutput, error) {
 				t.Logf("Formf request received")
 				formRequestChan <- formRequest{ctx, w}
 				t.Logf("Formf request relayed")
@@ -184,7 +185,7 @@ func TestWhisperFormRejected(t *testing.T) {
 				defer t.Logf("Formf response sent")
 				return res.submitted, res.outputs, res.err
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				t.Logf("Markdownf request received")
 				markdownRequestChan <- w
 				t.Logf("Markdownf request relayed")
@@ -232,18 +233,18 @@ func TestWhisperFormRejected(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-formRequestChan:
-			exp := &ldk.WhisperContentForm{
+			exp := &whisper.WhisperContentForm{
 				Label:       "Example Controller Go",
 				Markdown:    "Tell us about yourself",
 				CancelLabel: "Cancel",
 				SubmitLabel: "Submit",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"name": &ldk.WhisperContentFormInputText{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"name": &whisper.WhisperContentFormInputText{
 						Label:   "Full Name",
 						Tooltip: "Your full name.",
 						Order:   1,
 					},
-					"email": &ldk.WhisperContentFormInputText{
+					"email": &whisper.WhisperContentFormInputText{
 						Label:   "Email Address",
 						Tooltip: "Your email address.",
 						Order:   2,
@@ -251,7 +252,7 @@ func TestWhisperFormRejected(t *testing.T) {
 				},
 			}
 			if got := req.w; !cmp.Equal(got, exp,
-				cmpopts.IgnoreFields(ldk.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
+				cmpopts.IgnoreFields(whisper.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
 			) {
 				return fmt.Errorf("unexpected markdown:\n%s", cmp.Diff(got, exp))
 			}
@@ -271,8 +272,8 @@ func TestWhisperFormRejected(t *testing.T) {
 			return errors.New("timeout")
 		case formResponseChan <- formResponse{
 			submitted: false,
-			outputs: map[string]ldk.WhisperContentFormOutput{
-				"name": &ldk.WhisperContentFormOutputText{},
+			outputs: map[string]whisper.WhisperContentFormOutput{
+				"name": &whisper.WhisperContentFormOutputText{},
 			},
 			err: nil,
 		}:
@@ -291,7 +292,7 @@ func TestWhisperFormRejected(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "It's rude to not tell us your name.",
 			}
@@ -324,20 +325,20 @@ func TestWhisperFormRejected(t *testing.T) {
 func TestWhisperFormUpdateValid(t *testing.T) {
 	type formRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentForm
+		w   *whisper.WhisperContentForm
 	}
 	type formUpdate struct {
-		outputs map[string]ldk.WhisperContentFormOutput
+		outputs map[string]whisper.WhisperContentFormOutput
 		err     error
 	}
 	formRequestChan := make(chan formRequest)
 	formUpdateChan := make(chan formUpdate)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Formf: func(ctx context.Context, w *ldk.WhisperContentForm) (bool, map[string]ldk.WhisperContentFormOutput, error) {
+			Formf: func(ctx context.Context, w *whisper.WhisperContentForm) (bool, map[string]whisper.WhisperContentFormOutput, error) {
 				t.Logf("Formf request received")
 				formRequestChan <- formRequest{ctx, w}
 				t.Logf("Formf request relayed")
@@ -346,15 +347,15 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 
 				t.Logf("Formf update received")
 				for key, rawOutput := range update.outputs {
-					output := rawOutput.(*ldk.WhisperContentFormOutputText)
-					w.Inputs[key].(*ldk.WhisperContentFormInputText).OnChange(output.Value)
+					output := rawOutput.(*whisper.WhisperContentFormOutputText)
+					w.Inputs[key].(*whisper.WhisperContentFormInputText).OnChange(output.Value)
 					t.Logf("Formf update onChange called")
 				}
 
 				defer t.Logf("Formf response sent")
 				return false, nil, nil
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				t.Logf("Markdownf request received")
 				markdownRequestChan <- w
 				t.Logf("Markdownf request relayed")
@@ -402,18 +403,18 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-formRequestChan:
-			exp := &ldk.WhisperContentForm{
+			exp := &whisper.WhisperContentForm{
 				Label:       "Example Controller Go",
 				Markdown:    "Tell us about yourself",
 				CancelLabel: "Cancel",
 				SubmitLabel: "Submit",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"name": &ldk.WhisperContentFormInputText{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"name": &whisper.WhisperContentFormInputText{
 						Label:   "Full Name",
 						Tooltip: "Your full name.",
 						Order:   1,
 					},
-					"email": &ldk.WhisperContentFormInputText{
+					"email": &whisper.WhisperContentFormInputText{
 						Label:   "Email Address",
 						Tooltip: "Your email address.",
 						Order:   2,
@@ -421,7 +422,7 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 				},
 			}
 			if got := req.w; !cmp.Equal(got, exp,
-				cmpopts.IgnoreFields(ldk.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
+				cmpopts.IgnoreFields(whisper.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
 			) {
 				return fmt.Errorf("unexpected markdown:\n%s", cmp.Diff(got, exp))
 			}
@@ -440,8 +441,8 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case formUpdateChan <- formUpdate{
-			outputs: map[string]ldk.WhisperContentFormOutput{
-				"email": &ldk.WhisperContentFormOutputText{
+			outputs: map[string]whisper.WhisperContentFormOutput{
+				"email": &whisper.WhisperContentFormOutputText{
 					Value: "example@example.com",
 				},
 			},
@@ -462,7 +463,7 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "Valid Email Address: example@example.com",
 			}
@@ -480,20 +481,20 @@ func TestWhisperFormUpdateValid(t *testing.T) {
 func TestWhisperFormUpdateInvalid(t *testing.T) {
 	type formRequest struct {
 		ctx context.Context
-		w   *ldk.WhisperContentForm
+		w   *whisper.WhisperContentForm
 	}
 	type formUpdate struct {
-		outputs map[string]ldk.WhisperContentFormOutput
+		outputs map[string]whisper.WhisperContentFormOutput
 		err     error
 	}
 	formRequestChan := make(chan formRequest)
 	formUpdateChan := make(chan formUpdate)
-	markdownRequestChan := make(chan *ldk.WhisperContentMarkdown)
+	markdownRequestChan := make(chan *whisper.WhisperContentMarkdown)
 	markdownResponseChan := make(chan error)
 
 	sidekick := &ldktest.Sidekick{
 		WhisperService: &ldktest.WhisperService{
-			Formf: func(ctx context.Context, w *ldk.WhisperContentForm) (bool, map[string]ldk.WhisperContentFormOutput, error) {
+			Formf: func(ctx context.Context, w *whisper.WhisperContentForm) (bool, map[string]whisper.WhisperContentFormOutput, error) {
 				t.Logf("Formf request received")
 				formRequestChan <- formRequest{ctx, w}
 				t.Logf("Formf request relayed")
@@ -502,15 +503,15 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 
 				t.Logf("Formf update received")
 				for key, rawOutput := range update.outputs {
-					output := rawOutput.(*ldk.WhisperContentFormOutputText)
-					w.Inputs[key].(*ldk.WhisperContentFormInputText).OnChange(output.Value)
+					output := rawOutput.(*whisper.WhisperContentFormOutputText)
+					w.Inputs[key].(*whisper.WhisperContentFormInputText).OnChange(output.Value)
 					t.Logf("Formf update onChange called")
 				}
 
 				defer t.Logf("Formf response sent")
 				return false, nil, nil
 			},
-			Markdownf: func(ctx context.Context, w *ldk.WhisperContentMarkdown) error {
+			Markdownf: func(ctx context.Context, w *whisper.WhisperContentMarkdown) error {
 				t.Logf("Markdownf request received")
 				markdownRequestChan <- w
 				t.Logf("Markdownf request relayed")
@@ -558,18 +559,18 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-formRequestChan:
-			exp := &ldk.WhisperContentForm{
+			exp := &whisper.WhisperContentForm{
 				Label:       "Example Controller Go",
 				Markdown:    "Tell us about yourself",
 				CancelLabel: "Cancel",
 				SubmitLabel: "Submit",
-				Inputs: map[string]ldk.WhisperContentFormInput{
-					"name": &ldk.WhisperContentFormInputText{
+				Inputs: map[string]whisper.WhisperContentFormInput{
+					"name": &whisper.WhisperContentFormInputText{
 						Label:   "Full Name",
 						Tooltip: "Your full name.",
 						Order:   1,
 					},
-					"email": &ldk.WhisperContentFormInputText{
+					"email": &whisper.WhisperContentFormInputText{
 						Label:   "Email Address",
 						Tooltip: "Your email address.",
 						Order:   2,
@@ -577,7 +578,7 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 				},
 			}
 			if got := req.w; !cmp.Equal(got, exp,
-				cmpopts.IgnoreFields(ldk.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
+				cmpopts.IgnoreFields(whisper.WhisperContentFormInputText{}, "OnChange"), // function will never match, needs to be ignored
 			) {
 				return fmt.Errorf("unexpected markdown:\n%s", cmp.Diff(got, exp))
 			}
@@ -596,8 +597,8 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case formUpdateChan <- formUpdate{
-			outputs: map[string]ldk.WhisperContentFormOutput{
-				"email": &ldk.WhisperContentFormOutputText{
+			outputs: map[string]whisper.WhisperContentFormOutput{
+				"email": &whisper.WhisperContentFormOutputText{
 					Value: "INVALID!!!!",
 				},
 			},
@@ -618,7 +619,7 @@ func TestWhisperFormUpdateInvalid(t *testing.T) {
 		case <-timeout.C:
 			return errors.New("timeout")
 		case req := <-markdownRequestChan:
-			exp := &ldk.WhisperContentMarkdown{
+			exp := &whisper.WhisperContentMarkdown{
 				Label:    "Example Controller Go",
 				Markdown: "Invalid Email Address: INVALID!!!!",
 			}

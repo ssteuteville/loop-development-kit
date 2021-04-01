@@ -1,29 +1,29 @@
 package ldktest
 
 import (
-	ldk "github.com/open-olive/loop-development-kit/ldk/go/v2"
+	"github.com/open-olive/loop-development-kit/ldk/go/v2/service"
 )
 
 type Sidekick struct {
-	ClipboardService  ldk.ClipboardService
-	CursorService     ldk.CursorService
-	FilesystemService ldk.FilesystemService
-	KeyboardService   ldk.KeyboardService
-	NetworkService    ldk.NetworkService
-	ProcessService    ldk.ProcessService
-	VaultService      ldk.VaultService
-	UIService         ldk.UIService
-	WhisperService    ldk.WhisperService
-	WindowService     ldk.WindowService
+	ClipboardService  service.ClipboardService
+	CursorService     service.CursorService
+	FilesystemService service.FilesystemService
+	KeyboardService   service.KeyboardService
+	NetworkService    service.NetworkService
+	ProcessService    service.ProcessService
+	VaultService      service.VaultService
+	UIService         service.UIService
+	WhisperService    service.WhisperService
+	WindowService     service.WindowService
 }
 
-func (s *Sidekick) Clipboard() ldk.ClipboardService   { return s.ClipboardService }
-func (s *Sidekick) Cursor() ldk.CursorService         { return s.CursorService }
-func (s *Sidekick) Filesystem() ldk.FilesystemService { return s.FilesystemService }
-func (s *Sidekick) Keyboard() ldk.KeyboardService     { return s.KeyboardService }
-func (s *Sidekick) Network() ldk.NetworkService       { return s.NetworkService }
-func (s *Sidekick) Process() ldk.ProcessService       { return s.ProcessService }
-func (s *Sidekick) Vault() ldk.VaultService           { return s.VaultService }
-func (s *Sidekick) UI() ldk.UIService                 { return s.UIService }
-func (s *Sidekick) Whisper() ldk.WhisperService       { return s.WhisperService }
-func (s *Sidekick) Window() ldk.WindowService         { return s.WindowService }
+func (s *Sidekick) Clipboard() service.ClipboardService   { return s.ClipboardService }
+func (s *Sidekick) Cursor() service.CursorService         { return s.CursorService }
+func (s *Sidekick) Filesystem() service.FilesystemService { return s.FilesystemService }
+func (s *Sidekick) Keyboard() service.KeyboardService     { return s.KeyboardService }
+func (s *Sidekick) Network() service.NetworkService       { return s.NetworkService }
+func (s *Sidekick) Process() service.ProcessService { return s.ProcessService }
+func (s *Sidekick) Vault() service.VaultService     { return s.VaultService }
+func (s *Sidekick) UI() service.UIService           { return s.UIService }
+func (s *Sidekick) Whisper() service.WhisperService { return s.WhisperService }
+func (s *Sidekick) Window() service.WindowService         { return s.WindowService }
