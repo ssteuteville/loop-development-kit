@@ -477,5 +477,7 @@ declare namespace OliveHelps {
     writeFile: ReadableWithFourParams<string, Array<number>, WriteOperation, WriteMode, void>;
 
     join: ReadableWithParam<string[], string>;
+
+    ocr: ReadableWithParam<string, void>;
   }
 }

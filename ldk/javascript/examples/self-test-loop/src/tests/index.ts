@@ -401,7 +401,8 @@ export const queryDirectory = (): Promise<boolean> =>
         setTimeout(() => {
           reject(error);
         }, 1500);
-      }).finally(async () => {
+      })
+      .finally(async () => {
         await filesystem.remove(`${dirPath}/file.json`);
       });
   });
@@ -658,6 +659,19 @@ export const fileExists = (): Promise<boolean> =>
           reject(error);
         });
     });
+  });
+
+export const ocr = (): Promise<boolean> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await filesystem.ocr('home');
+
+      resolve(true);
+    } catch (error) {
+      console.error(error);
+
+      reject(error);
+    }    
   });
 
 export const testNetworkAndListComponents = (): Promise<boolean> =>

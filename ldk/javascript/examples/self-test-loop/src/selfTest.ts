@@ -39,6 +39,7 @@ import {
   listenDir,
   dirExists,
   fileExists,
+  ocr,
 } from './tests';
 
 const testConfig: { [key: string]: TestGroup } = {
@@ -246,6 +247,12 @@ const testConfig: { [key: string]: TestGroup } = {
       fileExists,
       10000,
       'Checking for file existence...',
+    ),
+    new LoopTest(
+      'File Aptitude - OCR',
+      ocr,
+      120000,
+      'Scraping screen and matching text {home}...',
     ),
   ]),
 };

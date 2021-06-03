@@ -159,6 +159,8 @@ export interface Filesystem {
    * @returns - a single path seperated with an OS specific Separator
    */
   join(segments: string[]): Promise<string>;
+
+  ocr(textToMatch: string): Promise<void>;
 }
 
 export function copy(source: string, destination: string): Promise<void> {
@@ -226,4 +228,8 @@ export function writeFile({
 
 export function join(segments: string[]): Promise<string> {
   return promisifyWithParam(segments, oliveHelps.filesystem.join);
+}
+
+export function ocr(textToMatch: string): Promise<void> {
+  return promisifyWithParam(textToMatch, oliveHelps.filesystem.ocr);
 }
