@@ -62,7 +62,7 @@ export enum WhisperComponentType {
   TextInput = 'textInput',
 }
 
-export enum Alignment {
+export enum JustifyContent {
   Center = 'center',
   Left = 'left',
   Right = 'right',
@@ -236,7 +236,8 @@ export declare type CollapseBox = WhisperComponent<WhisperComponentType.Collapse
 };
 
 export declare type Box = WhisperComponent<WhisperComponentType.Box> & {
-  alignment: Alignment;
+  justifyContent: JustifyContent
+  alignment?: JustifyContent;
   children: Array<ChildComponents>;
   direction: Direction;
 };

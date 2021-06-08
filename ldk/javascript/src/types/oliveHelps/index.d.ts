@@ -257,7 +257,7 @@ declare namespace OliveHelps {
     Warning = 'warning',
   }
 
-  enum Alignment {
+  enum JustifyContent {
     Center = 'center',
     Left = 'left',
     Right = 'right',
@@ -403,7 +403,7 @@ declare namespace OliveHelps {
   };
 
   type Box = Component<WhisperComponentType.Box> & {
-    alignment: Alignment;
+    alignment: JustifyContent;
     children: Array<ChildComponents>;
     direction: Direction;
   };

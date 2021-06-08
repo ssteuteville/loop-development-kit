@@ -250,7 +250,7 @@ export const testMarkdownWhisper = (): Promise<boolean> =>
             type: whisper.WhisperComponentType.RadioGroup,
           },
           {
-            alignment: whisper.Alignment.SpaceEvenly,
+            justifyContent: whisper.JustifyContent.SpaceEvenly,
             direction: whisper.Direction.Horizontal,
             children: [
               {
@@ -778,7 +778,7 @@ export const buttonWhisper = (): Promise<boolean> =>
           type: whisper.WhisperComponentType.Markdown,
         },
         {
-          alignment: whisper.Alignment.SpaceEvenly,
+          justifyContent: whisper.JustifyContent.SpaceEvenly,
           direction: whisper.Direction.Horizontal,
           children: [
             {
@@ -807,7 +807,7 @@ export const buttonWhisper = (): Promise<boolean> =>
           type: whisper.WhisperComponentType.Box,
         },
         {
-          alignment: whisper.Alignment.SpaceEvenly,
+          justifyContent: whisper.JustifyContent.SpaceEvenly,
           direction: whisper.Direction.Horizontal,
           children: [
             {
@@ -1094,8 +1094,7 @@ export const networkWebSocket = (): Promise<boolean> =>
                 await testUtils.finalizeWebsocketTest(cancellable, socket);
               }
             }
-          } else {
-            if (JSON.stringify(message) === JSON.stringify(testData)) {
+          } else if (JSON.stringify(message) === JSON.stringify(testData)) {
               console.debug(`Received binary data`);
               binaryTestPassed = true;
               if (textTestPassed) {
@@ -1103,7 +1102,6 @@ export const networkWebSocket = (): Promise<boolean> =>
                 await testUtils.finalizeWebsocketTest(cancellable, socket);
               }
             }
-          }
         }
       });
       // send text
