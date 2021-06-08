@@ -403,7 +403,8 @@ declare namespace OliveHelps {
   };
 
   type Box = Component<WhisperComponentType.Box> & {
-    alignment: JustifyContent;
+    justifyContent: JustifyContent;
+    alignment?: JustifyContent;
     children: Array<ChildComponents>;
     direction: Direction;
   };
