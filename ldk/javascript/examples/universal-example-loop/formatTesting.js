@@ -16,14 +16,8 @@ export const showFormatTestingExample = async () => {
             type: Markdown,
           },
           {
-            type: Divider,
-          },
-          {
             body: 'box2',
             type: Markdown,
-          },
-          {
-            type: Divider,
           },
           {
             body: 'box',
@@ -65,14 +59,8 @@ export const showFormatTestingExample = async () => {
         type: Markdown,
       },
       {
-        type: Divider,
-      },
-      {
         body: 'markdown1',
         type: Markdown,
-      },
-      {
-        type: Divider,
       },
       {
         body: 'markdown2',
