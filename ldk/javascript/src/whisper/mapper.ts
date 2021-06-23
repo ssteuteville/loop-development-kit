@@ -155,5 +155,6 @@ export function mapToExternalWhisper(whisper: OliveHelps.Whisper): Whisper {
     update(updateWhisper: UpdateWhisper, cb): void {
       whisper.update(mapToInternalWhisper(updateWhisper), cb);
     },
+    componentState: new Map<string, string|boolean|number>(),
   };
 }

@@ -34,6 +34,7 @@ export interface WhisperAptitude {
 // }
 
 export function create(whisperRequest: NewWhisper): Promise<Whisper> {
+  // TODO: temp state, will move it later
   const stateMap = getEditableComponentsStateMap(whisperRequest.components);
 
   return new Promise((resolve, reject) => {
@@ -111,6 +112,7 @@ const mapToInternalComponent = (
 };
 
 // TODO: add more editable components
+// TODO: we may bot going to need it
 const getEditableComponentsStateMap = (components: Array<Component>): StateMap => {
   const componentStateMap = new Map<string, string|boolean>();
   components.forEach((component) => {
