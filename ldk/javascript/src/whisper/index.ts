@@ -35,8 +35,8 @@ export interface WhisperAptitude {
 
 export function create(whisperRequest: NewWhisper): Promise<Whisper> {
   // TODO: temp state, will move it later
-  const stateMap = getEditableComponentsStateMap(whisperRequest.components);
-
+  // const stateMap = setDefaultStateMap(whisperRequest.components, new Map());
+  const stateMap = new Map();
   return new Promise((resolve, reject) => {
     try {
       oliveHelps.whisper.create(
@@ -64,10 +64,7 @@ const mapToInternalWhisperRequest = (
   onClose: whisperRequest.onClose,
 });
 
-const mapToExternalWhisper = (
-  whisper: OliveHelps.Whisper,
-  stateMap: StateMap,
-): Whisper => ({
+const mapToExternalWhisper = (whisper: OliveHelps.Whisper, stateMap: StateMap): Whisper => ({
   id: whisper.id,
   close: whisper.close,
   componentState: stateMap,
@@ -76,7 +73,10 @@ const mapToExternalWhisper = (
   },
 });
 
-const mapToInternalUpdateWhisper = (updateWhisper: UpdateWhisper,   stateMap: StateMap): OliveHelps.UpdateWhisper => ({
+const mapToInternalUpdateWhisper = (
+  updateWhisper: UpdateWhisper,
+  stateMap: StateMap,
+): OliveHelps.UpdateWhisper => ({
   label: updateWhisper.label,
   components: mapToInternalComponents(updateWhisper.components, stateMap),
 });
@@ -103,33 +103,14 @@ const mapToInternalComponent = (
         id: component.id,
         label: component.label,
         open: component.open,
-        children: component.children.map((children) => mapToInternalChildComponent(children, stateMap)),
+        children: component.children.map((children) =>
+          mapToInternalChildComponent(children, stateMap),
+        ),
         type: WhisperComponentType.CollapseBox,
       };
     default:
       return mapToInternalChildComponent(component, stateMap);
   }
-};
-
-// TODO: add more editable components
-// TODO: we may bot going to need it
-const getEditableComponentsStateMap = (components: Array<Component>): StateMap => {
-  const componentStateMap = new Map<string, string|boolean|number>();
-  components.forEach((component) => {
-    switch (component.type) {
-      // ...
-      case 'email':
-      case 'textInput':
-        if (component.id && component.value) {
-          componentStateMap.set(component.id, component.value);
-        }
-        break;
-      default:
-        break;
-    }
-  });
-
-  return componentStateMap;
 };
 
 const mapToInternalChildComponent = (
@@ -145,7 +126,9 @@ const mapToInternalChildComponent = (
           id: component.id,
           alignment: 'justifyContent' in component ? component.justifyContent : component.alignment,
           direction: component.direction,
-          children: component.children.map((children) => mapToInternalChildComponent(children, stateMap)),
+          children: component.children.map((children) =>
+            mapToInternalChildComponent(children, stateMap),
+          ),
           type: WhisperComponentType.Box,
           onClick: (error, whisper) => {
             onClick(error, mapToExternalWhisper(whisper, stateMap));
@@ -156,7 +139,9 @@ const mapToInternalChildComponent = (
         id: component.id,
         alignment: 'justifyContent' in component ? component.justifyContent : component.alignment,
         direction: component.direction,
-        children: component.children.map((children) => mapToInternalChildComponent(children, stateMap)),
+        children: component.children.map((children) =>
+          mapToInternalChildComponent(children, stateMap),
+        ),
         type: WhisperComponentType.Box,
       };
     case WhisperComponentType.Button:
@@ -177,6 +162,10 @@ const mapToInternalChildComponent = (
         },
       } as OliveHelps.Checkbox;
     case WhisperComponentType.Email:
+      console.info(`Constructing email with id: ${component.id}, value: ${component.value}`);
+      if (component.id && component.value) {
+        stateMap.set(component.id, component.value);
+      }
       return {
         ...component,
         onChange: (error, param, whisper) => {
@@ -255,6 +244,10 @@ const mapToInternalChildComponent = (
         },
       } as OliveHelps.Telephone;
     case WhisperComponentType.TextInput:
+      console.info(`Constructing text input with id: ${component.id}, value: ${component.value}`);
+      if (component.id && component.value) {
+        stateMap.set(component.id, component.value);
+      }
       return {
         ...component,
         onChange: (error, param, whisper) => {
