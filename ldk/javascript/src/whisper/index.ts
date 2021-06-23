@@ -114,14 +114,14 @@ const mapToInternalComponent = (
 // TODO: add more editable components
 // TODO: we may bot going to need it
 const getEditableComponentsStateMap = (components: Array<Component>): StateMap => {
-  const componentStateMap = new Map<string, string|boolean>();
+  const componentStateMap = new Map<string, string|boolean|number>();
   components.forEach((component) => {
     switch (component.type) {
       // ...
       case 'email':
       case 'textInput':
-        if (component.id) {
-          componentStateMap.set(component.id, '');
+        if (component.id && component.value) {
+          componentStateMap.set(component.id, component.value);
         }
         break;
       default:
