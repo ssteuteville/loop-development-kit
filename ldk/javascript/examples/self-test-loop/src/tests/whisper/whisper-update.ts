@@ -186,7 +186,13 @@ export const updateCollapseState = (): Promise<boolean> =>
           updateWithConfirmation(
             resolve,
             reject,
-            [collapseBox],
+            [
+              {
+                type: WhisperComponentType.Message,
+                header: 'New Message',
+              },
+              collapseBox,
+            ],
             'Did the CollapseBox stay expanded?',
             'User selected update failed.',
           ),
