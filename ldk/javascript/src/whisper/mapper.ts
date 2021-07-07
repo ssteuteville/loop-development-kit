@@ -110,6 +110,7 @@ export function mapToInternalChildComponent(
     case WhisperComponentType.Divider:
     case WhisperComponentType.ListPair:
     case WhisperComponentType.Markdown:
+    case WhisperComponentType.SectionTitle:
     case WhisperComponentType.Message:
       return component;
     case WhisperComponentType.Number:
@@ -193,7 +194,26 @@ export function mapToInternalChildComponent(
     default:
       throw new Error('Unexpected component type');
   }
+  
+  case WhisperComponentType.TextInput:
+    if (component.id && component.value) {
+      stateMap.set(component.id, component.value);
+    }
+    return {
+      ...component,
+      onChange: (error, param, whisper) => {
+        if (component.id) {
+          stateMap.set(component.id, param);
+        }
+        component.onChange(error, param, mapToExternalWhisper(whisper, stateMap));
+      },
+    } as OliveHelps.TextInput;
+  default:
+    throw new Error('Unexpected component type');
 }
+}
+
+
 
 export function mapToInternalComponent(
   component: Component,

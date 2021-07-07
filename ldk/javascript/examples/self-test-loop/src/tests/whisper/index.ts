@@ -97,6 +97,10 @@ export const testMarkdownWhisper = (): Promise<boolean> =>
       },
       components: [
         {
+          body: 'section Title',
+          type: WhisperComponentType.SectionTitle,
+        },
+        {
           body: markdown,
           type: WhisperComponentType.Markdown,
         },

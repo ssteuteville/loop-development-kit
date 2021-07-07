@@ -13,7 +13,7 @@ let formWhisper = null;
 const getPatientFormWhisperComponents = (patient) => [
   {
     label: 'First Name',
-    onChange: (error, value) => {
+    onChange: (error, value) => 
       if (value != null) {
         patient.setFirstName(value);
       }
