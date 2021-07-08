@@ -123,6 +123,6 @@ export const whisperTestGroup = (): TestGroup =>
       'Whisper Aptitude - SectionTitle',
       whisperTests.testSectionTitle,
       10000,
-      'Did SectionTitle render properly?'
-    )
+      'Did SectionTitle render properly?',
+    ),
   ]);

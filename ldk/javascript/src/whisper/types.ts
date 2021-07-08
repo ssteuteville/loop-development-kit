@@ -58,8 +58,8 @@ export enum WhisperComponentType {
    * The text can be pre-populated by the loop.
    */
   TextInput = 'textInput',
-    /**
-     * The section title field allows the user to provide section title information.
+  /**
+   * The section title field allows the user to provide section title information.
    */
   SectionTitle = 'sectionTitle',
 }

@@ -196,9 +196,6 @@ export function mapToInternalChildComponent(
   }
 }
 
-
-
-
 export function mapToInternalComponent(
   component: Component,
   stateMap: StateMap,
