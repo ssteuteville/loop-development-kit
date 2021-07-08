@@ -106,6 +106,11 @@ export enum Urgency {
   Warning = 'warning',
 }
 
+export type Validation = {
+  triggered: boolean;
+  message?: string;
+};
+
 export type StateMap = Map<string, string | boolean | number>;
 
 export interface Whisper {
@@ -131,6 +136,55 @@ export interface WhisperComponent<T extends WhisperComponentType> {
   key?: string;
 }
 
+interface InputComponent<T1 extends WhisperComponentType, T2> extends WhisperComponent<T1> {
+  label: string;
+  tooltip?: string;
+  validationError?: string;
+  value?: T2;
+  onBlur?: (error: Error | undefined) => void;
+  onFocus?: (error: Error | undefined) => void;
+  onChange: WhisperHandlerWithParam<T2>;
+}
+
+interface SelectComponent<T extends WhisperComponentType> extends WhisperComponent<T> {
+  validationError?: string;
+}
+
+export type Checkbox = SelectComponent<WhisperComponentType.Checkbox> & {
+  label: string;
+  tooltip?: string;
+  value: boolean;
+  onChange: WhisperHandlerWithParam<boolean>;
+};
+
+export type RadioGroup = SelectComponent<WhisperComponentType.RadioGroup> & {
+  onSelect: WhisperHandlerWithParam<number>;
+  options: string[];
+  selected?: number;
+};
+
+export type Select = SelectComponent<WhisperComponentType.Select> & {
+  label: string;
+  options: string[];
+  onSelect: WhisperHandlerWithParam<number>;
+  selected?: number;
+  tooltip?: string;
+};
+
+export type Email = InputComponent<WhisperComponentType.Email, string>;
+
+export type NumberInput = InputComponent<WhisperComponentType.Number, number> & {
+  max?: number;
+  min?: number;
+  step?: number;
+};
+
+export type Password = InputComponent<WhisperComponentType.Password, string>;
+
+export type Telephone = InputComponent<WhisperComponentType.Telephone, string>;
+
+export type TextInput = InputComponent<WhisperComponentType.TextInput, string>;
+
 export type Button = WhisperComponent<WhisperComponentType.Button> & {
   buttonStyle?: ButtonStyle;
   disabled?: boolean;
@@ -138,22 +192,6 @@ export type Button = WhisperComponent<WhisperComponentType.Button> & {
   onClick: WhisperHandler;
   size?: ButtonSize;
   tooltip?: string;
-};
-
-export type Checkbox = WhisperComponent<WhisperComponentType.Checkbox> & {
-  label: string;
-  tooltip?: string;
-  value: boolean;
-  onChange: WhisperHandlerWithParam<boolean>;
-};
-
-export type Email = WhisperComponent<WhisperComponentType.Email> & {
-  label: string;
-  onChange: WhisperHandlerWithParam<string>;
-  tooltip?: string;
-  value?: string;
-  onBlur?: (error: Error | undefined) => void;
-  onFocus?: (error: Error | undefined) => void;
 };
 
 export type Link = WhisperComponent<WhisperComponentType.Link> & {
@@ -185,64 +223,11 @@ export type Message = WhisperComponent<WhisperComponentType.Message> & {
   tooltip?: string;
 };
 
-export type NumberInput = WhisperComponent<WhisperComponentType.Number> & {
-  label: string;
-  onChange: WhisperHandlerWithParam<number>;
-  value?: number;
-  max?: number;
-  min?: number;
-  step?: number;
-  tooltip?: string;
-  onBlur?: (error: Error | undefined) => void;
-  onFocus?: (error: Error | undefined) => void;
-};
-
-export type Password = WhisperComponent<WhisperComponentType.Password> & {
-  label: string;
-  onChange: WhisperHandlerWithParam<string>;
-  tooltip?: string;
-  value?: string;
-  onBlur?: (error: Error | undefined) => void;
-  onFocus?: (error: Error | undefined) => void;
-};
-
-export type RadioGroup = WhisperComponent<WhisperComponentType.RadioGroup> & {
-  onSelect: WhisperHandlerWithParam<number>;
-  options: string[];
-  selected?: number;
-};
-
-export type Select = WhisperComponent<WhisperComponentType.Select> & {
-  label: string;
-  options: string[];
-  onSelect: WhisperHandlerWithParam<number>;
-  selected?: number;
-  tooltip?: string;
-};
-
-export type Telephone = WhisperComponent<WhisperComponentType.Telephone> & {
-  label: string;
-  onChange: WhisperHandlerWithParam<string>;
-  // pattern?: RegExp; TODO: Implement this
-  tooltip?: string;
-  value?: string;
-  onBlur?: (error: Error | undefined) => void;
-  onFocus?: (error: Error | undefined) => void;
-};
-
-export type TextInput = WhisperComponent<WhisperComponentType.TextInput> & {
-  label: string;
-  onChange: WhisperHandlerWithParam<string>;
-  tooltip?: string;
-  value?: string;
-  onBlur?: (error: Error | undefined) => void;
-  onFocus?: (error: Error | undefined) => void;
-};
-
 export type SectionTitle = WhisperComponent<WhisperComponentType.SectionTitle> & {
   body: string;
   textAlign?: TextAlign;
 };
+
 export type Divider = WhisperComponent<WhisperComponentType.Divider>;
 
 export type ChildComponents =
