@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-import { clipboard, whisper, network } from '@oliveai/ldk';
+import { clipboard, whisper, network, keyboard } from '@oliveai/ldk';
 import {
   JustifyContent,
   Direction,
@@ -12,97 +12,78 @@ import {
   NewWhisper,
   Component,
   DateTimeType,
+  AudioVolume,
 } from '@oliveai/ldk/dist/whisper/types';
 import { stripIndent } from 'common-tags';
 import { resolveRejectButtons } from './utils';
 
 export const testMarkdownWhisper = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
-    const options = ['M12.01', 'M00.123'];
-    const markdown = stripIndent`
-      A paragraph with *emphasis* and **strong importance**.
-      # H1 Markdown Example 
-      ## H2 Markdown Example 
-      ### H3 Markdown Example 
-      > A block quote with ~strikethrough~ and a URL: https://oliveai.com/
+    // const options = ['M12.01', 'M00.123'];
+    //  const imgUrl = 'data:image/gif;base64,R0lGODlhNgAKAPcDAPn7+Pj69/f59v3+/f7+/vr7+vT38/r7+fb59fz9+/X49Pv8+/z9/P39/P7//v7+/fb59vn7+f39/fv8+vT38vf59fr8+dLgzvn69+vx6ezy6vP38vH28O/07e3y6vL28f///u3z6/L28O7z7PD17vD17/H18PD07vP28vP28fH17+/z7bzRte7z7ff69+zy6+vx6vT39OXt4ujv5urw59vm1+Dq3d7o2+Lr3+bu5OLr4OTs4d/p26vFot3n2uHq3erx6Nzm2OXt48jZwtHfzMzcx7/TuMXXv9Phztnl1tXi0NDeysnZw9jk1Nbj0s3dyM7dycPWva7HpanEodTi0NDfzMrbxMLWvMvbxsrbxdbj0+jv5dzn2efu5Onw5trl1snaxKC+ltPgz8bYwc7dysXXwM3cyKTBm7PLq97p29rm1+Ls4L3St8DUurvQtMbYwMTXvrfOsLLKqr/TubXMrrfNr6bDnrDJqK/Ip7TLrLXMrYWsebnPsrjPsdrm1r3StrrQsouwf8zbxsbXwMLVu8vcxoaservRtOTt4X6nceHr3urw6ODp3dzo2fL18NHgzMfZwqzGo6K/mbrPssvbxajDn4uvfoCoc6XCnHqkbefu5aG/mJO1iJm5jpu6kIiufJm6j4KqdqXBm6zGpKPAmXOfZajEn4ywgK7HppO2if///568lN3o2bLKq5S2iY2xgpCzhJO1h+Xu44Srd+rx6Z28lNjl1Zi5jpy7kp+9lYmufpCzhZW2ioCpdI2xgXaiaXylb5u7kXGeY5a3i5e4jIeue46yg5W3ipGzhnija5i5jXCdYYyxgKLAmpu6kXKfY3WgZmiXWG+dYGeXV2qZWoyxgXukbX+oc32mb2CSUG2bXl+ST3ymb4WreGGTUX2mcPz8/NXj0ezx6fH276G+l4ywgWqZW5q5j5O1iZa3jPz+/K7IpfX59KTBnOnv5wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEEAAAh/wt4bXAgZGF0YXhtcP8/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG10YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDYgNzkuMTY0NzUzLCAyMDIxLzAyLzE1LTExOjUyOjEzICAgICAgICAiPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53Lm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZjphYm91dD0iIiD/eG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1uczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjIuMyAoTWFjaW50b3NoKSJ4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkRGODI2NTlFMTIwMTFFQjkyRTRCRjIyNTc2RTI0Q0Qi/yB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkRGMjY1N0FFMTIwMTFFQjkyRTRCRjIyNTc2RTI0Q0QiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWZpbnN0YW5jZUlEPSJ4bXAuaWlkOkRGODI2NTc3RTEyMDExRUI5MkU0QkYyMjU3NkUyNENEIiBzdFJlOmRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MjY1NzhFMTIwMTFFQjkyRTRCRjIyNTc2RTI0Q0QiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/cGFja2V0IGVuZP89InIiPz4B//79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcHBgUEAwIBAAAh/iZFZGl0ZWQgd2l0aCBlemdpZi5jb20gb25saW5lIEdJRiBtYWtlcgAh+QQEFQD/ACwAAAAANgAKAAAIyABVCRxIsKDBgwgTKlxocIAEBhIIMFRFQGLCBw4mInxYccAAEKpAgBzoAERGVQ5OiiQIUsIDjQYJMLAYkiKDBgMyemwwU9UAiR4lSBD4cACDlzAJEmgwcuBRB0ZVScj5gIEDnDIFzqya8mhSpT1JMhBIIIFUiwke4HwolIHDAUSRfrUJFyUBB+AkZo1IEdzVAVUfEMA4oIFWuXONup3qc2rPojdB4ATh1iPKm0YRz3VA4OfAzhan/gR5lyJosj8JNJ07kS9rgQEBACH5BAUEABkALAQAAAAuAAoAAAXTYCaOZEkMRKmOhLOy7ks+kQAJSywTUSJnkcVPRAggCotAIHVKZQgEySDjWDBEA8nIgRIUhpmEQvh8hBFoRlEgUEwIAF/gBoAaBYbvcIKYbhUHA3MPCAEDFgoDXguJDRULBQoMAwoFF3sIDSQMFCINBooTIhQTXgEKAAAIAEoiXmANqy0MCZxTE4kIBxkDFAleAAq1ExIBAi1HYBl8AkaGRhgIEQRoqgIPXgOFqQ8MCkp5yhkMBRETZgQTB2/UAAcWU5PjFgcJLgnrC37iOwKi/CJCAAAh+QQFBAAWACwDAAAALwAKAAAG/0CLcEgsEiSMQXE5HBCYw8cTWmQoTCVRYEp9KCJUiyEQbqI6AoBhI7EMFkr3gMGwEAITISMxJSwkKhBlQhEdZHoEACclKgcWKFgrAl4ADgYqHAYDAx8dJh6CgwIdCUQEIwgMGyQNJwYJCC8LIgIBIwkLJQECLQUTIxAfLGUBHXlDBRkOFgUeDCqHGgG0GyEpKR0xHxtCJoJcUAsdBg0EEwEFGnm2DCcIFgkwEbQKIwAFAAuXdiehg8UqPpxI0QDbhhMKBnRw1YFDA1oMOqQwYEBCgREfDIAaJMScAAUBGrhxAXLAgxMUEFRg4GBCnQkVEAAg4CACggAA6nAcsoxIzwcH0KiAgBIEACH5BAUEABAALAMAAAAvAAoAAAj/ACEIHEiwIIQECxo4MMiwwQCGAx9CNLhABRAaGhBMHNighMaJJz5uhNAgxIwNCDqMSACBQYQGAhk0KDABwgAFACCAKFAg4gEGtD6MFChAkwKBAxYQQOCFBpAAA0JkWLSFwgCPDk4sytChAQMNMzLIEDrUwIyeEWWIKDCCxoItHQp82HFAA8ocBw4sioGiS4AIOT5cMDLSwJYIBAOsERgAUQEaRyGsiWE3hIwWI2ac0DBCYIYPBHiMjKCZAQEACALQdWAgx4QZHxwc0CHArokcAgIgKNAByIABNMiOJGA2g4cZIRZ4oJGZBANNNDqEXWD3dYgTHRgE6KKhxQ7hQwGgMDChYEFLA+QbSHDX4UOKCafNA0jxAcEDAgJEGEBQcyhBAgUBaBNkCxkEgoACFQhBQAAh+QQFBQAQACwDAAAALwAKAAAI/wAhCBxIsOCDCQUYECjIEAIIBg0JMhgQkWEBDzJ25EBBsSIEBh42eMwg0qPABDNwdNgAhMYECAsCJDjJIEIECBI+CIDgIAKABwMBLJBxwqRAAzZSgBBoAcIGHDt2KGgwI+MPEgw0iMywQ0YGBgm64BDio4NRCCVwACAoIc0IADR2FFAEBECHRgFynNjAKECAHR868EAQgEcHNENMclAUgCCCGgIRcImwxoRANY70zrgxY4aiDF28CCT6ocfCigEUwVgAQcCGx41V8DiAYwUBDGoM6H3BwwCCDQAWyWgAQSWE0x5N/JCxBceMAilp4NCw4IcOIGMP6I3gPAOQCQhsdDNZFMTs2dYdPHwoALNEiA8JGOig0aHDgdb3BdTfQNHACBMb3HeeSQysoQIBDjCUIEHIBQQAIfkEBQQAFAAsAgAAADAACgAACP8AKQgcSLAghQEWACwwyNDBggYMByaIGBGAFx43fpSgOHDBjHEcNW3k2HFNEA8qcuw4QKEAgoUUJiwIAIBCgw4KKBAIEGCAQAYCJvCAQXLghyQkHFBgAGCAiiA+bmxgsAajHw8JtqigkCMNjxwLFQXhoSRDUYEhggQg2MAJkAAyfETwIytABiUQbGgokUQAAh8dNDQxgKBJhg92nBDg2MEPgoEgDCARaEBJAB8tKDhAskLvDieIdtTQ9GONwKEUatw6wRFCjS4FBihQIfnxiCYBgpgVgOSDXhpNRBhQEUDIDQYSuJilwEMDyRE1eOgIsiPCdBlBthT4wkVIdAB6A9Q+0NElhwUDTX4IKXtW4AMFGrx0iNByBI0OCxIEEZIhA4D3NcGXgQkSUPDBIiOUsFZ7AikVUQKYRbRYQSAIFBAAIfkEBQQAFQAsAgAAADAACgAACP8AKwgcSLCgQAABChhcWGECA4YCFzSAaDCAjCRNgoSYSHHCjg4UdYygSLDADSU0RvzgAaDCAQUKQRQoAEFABQYaKAiEgICgggNJtpAceOJCiIEBKoxQoqWJiQQ3MCKhsWBHCwI4mnzBMTOIki9QhA6tsEhJz4EJluRAYENLACQ/EGx5oqCGlxGPFChoomHGBREGiGwJUgmRKooakBgg6CjLgwofnghwIk4gFg12byxhxIgKjiBpBH7ZImGOJ7EMFVDREaEChREfsBggkIGIACVCEVA6YVdGlQ4fRiD40SQBA9wVJFyZQxIGkiQ+lNwIcMMJIyVrIiBxYuNrALsCqPhDwPEDgIlHQX48EStBA8kBG2bI0JA0AhAhGgosCPdjywwX8CUV3xYtMDDACTlkMIJNYxH02EAODLQAZRUQMJYDqqgSEAAh+QQFBAARACwCAAAAMAAKAAAH/4ARgoOEhRENAQIHhowEFoyEBQyQjAI2SEROGZOUEQU2Gp03QJ2EB0lQMhlcNQERABuLDgARCgggCTQiggoKDYIJBgAXO6WDIVhABBELAhEaZFUXHQtNSBdmOQU8oTcXSD4HB1pLSGPFxhFdSwqFTDgKNVUCZkEKO2UbSkIZWQYbF2jsyHLig5UdQ6SMKDWjyIdBDk5EEVTiiIIqMwRdmbHvy5AvX57ccJJEEJIdCqac4dBpg8gADURkIBEFRYQtTBAsKWYgSoh9P8B4IJFBgY8LCyLsrNUjDDpGA2Y8EdNkSRMBSZbUWMIDQJElQaBQEbBPwZMmN7gE6JDFSZAj6DgQGJFRioOMH14EgACwBQeNAwXA7pCBIIIJCBFEyNgRKkIIHTMyFBa0YIAxAgNAEMrsCSOlB5ACAQAh+QQFBAAQACwBAAAAMQAKAAAI/wAhCBxIsKBABgIQADDIEEKEBA0FHojYEAGXIliIbKEokQsNil9mcCQIAMkQHDSaKBEAIQCHhS0jGFDgYEEXEgINbGAw8EMAMz9GDsxwZCOECQoa0GCSpYiHCUieFCmj40CNj0mKQLEVAcCjIVCMBBUKYc0QCgQXtEljwIkVBGOaUGDE5sMSlFE+cKDU5UeUESau/BjQp5UBjjneqBhIIIQbgSPYGMgiRKAbIXeptFGiZMyXR1QEPglKo9MdBTk0NBTh2QUDEjNauDEBQcYVBUxsDPgAKMNdLlcWhZixoUmRAgmYjKXhqVatLxFljHmChAkSBNWdMKkRoAyYJpCgKFC4a2AMkiRNBISIQqQJm7EQNNhhEoFiB0WsciBwEADRjRwAHMBEEzb8kFQHCkBAwg+M0ABRBmnI4EWCAwkAEVkFOQCBBVnI8EBDAxAUokABAQAh+QQFBAAPACwBAAAAMQAKAAAI/wAfCBxIsOBABAoCDDDIEMAChgMjJIAIUUGTMUcKyZhI8QGAJls6KpHVsWCAJYTS5EBCBMEDASQCPCDgMcWGBxN2dBCI4gPHCSoEjGFVkqAXNkIEFjDAoAshOG9oWYAy5I0RHgCc5HhA5Q0TKgECFLkyJA5RgyUEGLRB6APBCZP8fHgER8EcJB+41CnBRCWLEiSO7LjBQkMHN6wUSDEC4AEDP7OUGNQxZ+cDEA8ytBKogU6KKDgEosHRd0mfKlXmKCmyROAQojVg/TnQJNacAgZJtFGidoSQF2h2KnJDgRCXBxzkzOjbxE2XDDI+IHljYcGVszVe9eD0Ry1DHG3GQGAhREYBmSuPCGkRYCQKkjZMDPTd0OaJEiQIMrDAcoFOo4E2uDKHdww1MIIPSayhwEuKJLFDABFcgQQXNzAVggEPtHADF10s0AANNeCQAwUEcXBAUQI5wFAEoC2EIk0PBAQAIfkEBQUAEAAsAQAAADEACgAACP8AIQgcSLCgwAQKNrgwyBBCgAkNBQJYEJHhBiRtjBzBQbFiACSIKhJZU7GgCyuAaqyBUkgBCAQtBICAICAAhw8QCvzwAGEABxUDC3RA0CZJQxptCuaog0OghQ0QdrhhM2dGBCaE5vQJEuDCDghL2hBaIvANoCt4jBrMkAhOQR+HgA48IMeJiiJsDPR5oiKJlBVR1OzQ06GFERt+9NAIkSeJBjtMKA5IA+GPQR59Qgh0AIHGFAkQgEjh8IeHwB48Ame5gwULnyWDrAgklGTAk0BDGNSAEAeAwRZ8qiBIoEEHkB4hHqRB8wFQEwgdpggJTAWNDBo6VDyZE2ECC6O2DdFzgUBHAUMJPPgQGuKGCQUmLAS5uYCgDosnfK5sCCyCz5AqTyhAgx5vPCGFWgMgsUcc5jXEgAZ+IGGDARAgcIMSNrgQgBtPNJFEChBkAJUGSTSxQwEM5KBFGmvgJBABGgRQkkANEEQAaBAAUBoEDxjUY0MBAQAh+QQFBAANACwBAAAAMQAKAAAI/wAbCBxIsKDABQY+CDDIsIGAAg0FBpgQkeGHKoD6zOFBsWKDJTgqFrHREMSWLwQFHMnT5IeVNwYaKPAwEIGAEyIaHLiRQWCJDgsEWhihwI2ThhkCHSG4Aw8PgRFEJPihJw6fHACiuOEjp0kDKD8aUJrEgpIAAW30sKh01OCIS3IWDkyipwPBCD0ukIAUJ4UcJh2U2PHApqWUER76+HAiZYuGSE5kbKrCQGBYNAa5yNFAUNMmgTPskKgTRKCkIIWPTBk0SI6gNksbsHAyoY0lIgNuNLgTwKAHNEUULABiY4YkDQNqRDKRR0mDEZt2FK4SSceWHx3A8AFQgM7RAm32GHBpgGdDwyBoWETRAycFHDqQ9DxRcIcOkzx/PhQugSaKIDAGdCFFG0xg0tYEb2RyxwcVLeJEFT5sQIACfjziw0J6MKGEExwkQENOGThBhSIWNLADEjXYwMFADMwgl0cMEEBQjA0EUEcNDQ0gwUAgEBQQACH5BAUEAAsALAEAAAAxAAoAAAj/ABcIHEiw4MANHBAYXCjwAEOBLgo8HGAgAEEOhfTIccPl4UABWHh4HOKDoSockXAMRDBHCpI0RwhtcGAgAwIHCxRA6FCCQAQ1NAR2aDEwgoYYei4wDPFpVIqBP0yVXABAxQIeqOTk2RHACB00PZS4yCLyTZ46bxAgOCSlTphHC0uEMqWAoBMpRAmSgtLhihwRPeCMeLRKA5+XdjRkkKNGjJ0ci0Q9urGqyQCBO/b0MJikxyKCMjwJzLGqw50kAkElOTxHUps2kSC5aSOQzoUAek41WWCD0xQBBjNEGmJgAQ0fOTwBWdBEFAlUjyR46PTjcBFRjITcCHEkT4AD0BcIddBj6E2qHiYWNkgSiQ4bVEZEGMETBRUTA1PuRJESx8ThDpGwAckRG8hghxtRrALXAgHwUcoUJTyUwAxIFPGFCAsY0MQTNSAgACpwEHFBhFtY5cUFj/DgkCJLNHEDCQMdoENdHi3wwEMunCbBZQY1MJADEgwUEAAh+QQFBAAHACwBAAAAMQAKAAAI/wAPCBxIsKDACR9KKDDI8AGCCAwHCrAQUeCWNQ0GloCEKpKeLwUqCoQAyYfIKDUq7hjGJoFABYDsVAnShsWHAxRoLBSIIESHAwCaaBIYwsOEgRkM4FkSsYMuTD8F8tjkR2CADguC2IkkBccBPnikNLsg4E2QA1ek3CF0QEEdO3dukWH4YY8kAwSR2PFAEAAuSiHY9FBxZo4HKMSAtJqZCwiNSE2W5NoxoxaUJrhMHiAgpFgzg07OzCC4BpnAHcRC9AgnEJmTxW48sWDRLgodNwKXGogEy8cDHOjOsDNIQ1SUDRO21JARy8sBKrU6VHrSIAMyHouH1LqxI4iGOVIORHOoNHdDJF1FeEFlyMCJKDx97AAqwacSGztHNpCaYsSOnBKLjYBJH1G08cEaYdBhxDBQCKSUMGdEFVEOSzDRhAoHbIAEGE0sVMkcZiyBlRA/bbHEE0FEkAAPgoRTg4QB1ICXSAcMUJEAPSiREXsgDLTjAQEBACH5BAUEAAIALAEAAAAxAAoAAAj/AAUIHEiQQAICBAtw6GCgAcGHBBUAgEgQwQGKAh+ssfJhYIcopjDhaWIB40AEUfyYFDCniUkZrqZ0FGCATpgnSVjEMSEgxRYDAiko0DBCQAAlQgRqyFBAIAAaKaZgwUgi0KaiArl4avJAYIsJXzaJssPIRZ4pdnBBQUAoyQA2lXr8URDjDrkeu7JQ3FAM1waCS8hpIBiA1xgNfM6cWOUmgxVjM6TgvEVjix0lgm4p0kQsCxVPPxAKyPFplYOHSGp1EYjwhyUGAnDA0nAGiQACupBIrhOrTp1cRu7QEdgDCwdRnHAQWMMrDNCHW4B/KCCjCQ5LWwRcGBZikxUBND75hZAMZ1iNH00yuLHjAoAkSgJOnCn36JgkrBCRrJqCZpOeDnpIwscmbaSASzOAhNFDB5J5kAsaRrjBwQ+33AGIMXoJwIEdAoQRgkkLIFIEHEiQ0BMRbyhhAAKSuAEGFkXt0IIAQhQCRhIT+QDJBU18KBACSKSw0kAJYITAGRfAhtFpAikpQEAAIfkEBQQAAAAsAQAAADEACgAACP8AAQgcSBCAgAUELZQYUbDhwAEGHBJUEEEiAAIA5AgZOGKOpDA9qBywKFCBkSYk3SixmIOXpA4D74AC4yQOmhIAROS4CACFASAaBF7YAUBdBiAjAQTYIoLUGImOTq3yMNAPOioDBIYAoMVTrk0+BOA5s+kYFgV/UPbZdKaPAQM9PInS9bShAl2dRBAs4glIwVdRMuRZ1YEYHSBjimmqRBOZphxhHjFBxkgIrDFVQMkYOMMSKIwEqxDbPJBHL4E2DGVYVQXAg1BVGN8JJEeOMkA97ggUNaZDLl6bidai0DDHLTccAKxRYiPURijGNDh7A2BGLzWM2xhrwkMJjTqbBABvwPU0RC5YSobloupQ9BlUnvC0wBMsjycWIobVogMK0wjGGSizDiB1lMADMj3QYUhdHYQBQC1BWYQDE208ApMITxByAQAKBEPHG0OEMAEOW+3AxBsoLVBDFEs4ESEABhShF0kSJTDQKkvQSNADAgUEACH5BAUFAAMALAAAAAAyAAoAAAj/AAcIHEhQ4AYABA90CLGBQcGHAwNAJIhwosAdkvyAEBjCDS5QZx5FsCjQACAlJOtcINllWK4QBntweoNEjpQOA0zI2CDwwwAaGQQuwTGAAY0ZBHOowBXF4gdfuDQMbMLskUABGgpQcXXLWRAEU1Z5MjZkAB8qA/I4y5VnwwZMnHL1ajox0DATBJlwokFQgKE5NPAQCwHrjpco14RsoqlLiAxQUOBY8rHjUxQHTzzlIBiI2MMnsNYQ9JFM4I1ENIgVEZjsyeIesyJFgkUHUySBtZp6CEasywAZw5yheCgDGZ0SBxRduJFpjQQsxTKgu8IgR7Imi90YcsIKyQw5nhAEdXBFF4gzZE3S1ZL6MEERZLVMpeoRogcvVOj6qDA27E6sXB4stggyldAhRwdcWHLGHYnQNYAHzjzjTFATTWADHCw8McIAKmTBxhI88XIHIXBkUIANUuEAxxVUSNTEHIIgQaFAKUCCF0kCLTCRAsQIMlEDCUwUEAAh+QQFBAAHACwAAAAAMgAKAAAI/wAPCBxIUKAICAQjtNDwoaDDgRseEjQQQCJBXEsGCNRQZxinXEsAWBRIgc4FBxblLBl54FgtDQI/YGJ2hYiUKSMIkFjT8ACHDVuAHBBQxIbALVsiCBQgowSxOSyDZRioZM/KAxAyWHjkK5arJAfOKHP1CY4BPY8O4DnWCU+KD2F8dUpmZKSrEgSP+NpSMJGbLT2Qafg0aouRXzuC1QyFaA0nQW1C1cDRywiBIgf4CvRygJdGglk+KSKoRpjAIL+27AIjUBgYxXaAVaqk604uOwJvQdUA6taMgaB6ElxjSU6HCIyWBBGGo8GQSzR81RWyTIniOJeQqKnSRQovgcbqHnWgAYpTkmG4pj4EY4kYKV+iNIgyNuVVHhLFYEUKBEqDYhqWkHKHFC34EUoukfwi3gEa3FIKKEJJVAAPbcSBhQcHkDDGJIJ8YIAxo7DRhlA3TGVDG0Zc4MIESrDARBU0EPQBHHix9NACAhmwCxMHSMASAQd8FhAAIfkEBQQAAQAsAQAAADEACgAACP8AAwgcSDAABwUgBgIIAUREwYcDP7iASBGiDGdFBmZAs6saqIwVBW6QsySklCcVtwzDNVBEGENzoEw5EyJABxwOH5T4kIOGQDA3BHbJAWDgmg7IWFR85QnIQCSJQCKgcWBJsVPGtCjIhcxYrzYb7iyR0AMWpx4fOHgyxOmZ0ocITnEqeMVQDoIQfsXJISpQhlB2hLhZpmOYkSfW1ijyxYQNsCSMkrGgBNHVQ0i9bAx8YCvaggB+lnWx9CbAAGpjDG+CJklSqFGeNgmMxSKDsk4EcT9UNEuKwBtPapizweBIshmG3DDYMQ2JYTTJHtl6IsOUMQUuPimdoczVl5ALxsxlQrbKUJgMYYqJMoSnwyVddva4omV4y6xVkUyFaALsnB1pb2VAjECLhMTKH3kMoYFNcNDBBAcbfGKHG39QFYRPafwByBICFIBEHGVA4UVLUYRE0AQEPUCQJYMk0MBDDHw2UAIDBQQAIfkEBWgAAwAsEAAAACIACgAACP8ABwh8QUOFwIMIE4oQkDDhBoE0UFkylApMgIYJP0h5gvHglCwqgl1jUehMLg0DWtgwOICECBlbBiAYw0WgLBkHK+BYEYhPlV9gDs6I8OSSoU9UBoA69SkTmwGRigywo8uXHQ4qeF3zRa2PkUs4DyKQlkdImG5AgDWTESfaj12HBEH7wcjQG0DQtKR51geOtRsInWQT2CSakFlRBGaLAheXtlq1uFXihUtgNT42sJkaAYALpSbeeAwgJGzLpTgDcGyrAhePMChOsuxo9mmAgF58BkTBdupWL2eLPPUKc6nHiEyhJCV6RQNujm+3KjUb4ASaK0nT+gw4UGMSniMZUrYmkfPGYC9JcfjE9DNjABc+caQOIJLnSqGYAiU0nCBww6wrHQU4QEAAOw==';
+  
+    const markdown1 = stripIndent`![](https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/AJ_Digital_Camera.svg)`;
+    const markdown2 = stripIndent`![](https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/Steps.svg)`;
+    let firstDisplayed = true;
+    // const markdown = stripIndent`![Alt Text](${imgUrl})`;
 
-      * Lists
-      * [ ] todo
-      * [x] done
-
-      A table:
-
-      | Table Header 1 | Table header 2 |
-      | - | - |
-      | Row 1 Col 1 | Row 1 Col 2 |
-      | Row 2 Col 1 | Row 2 Col 2 |`;
-
-    await whisper.create({
+    const createdWhisper = await whisper.create({
       label: 'Markdown whisper Test',
       onClose: () => {
         console.debug('closed');
       },
       components: [
         {
-          body: markdown,
+          body: markdown1,
           type: WhisperComponentType.Markdown,
         },
         {
-          label: `${options[0]}  
-            line one
-            line two 100.0%`,
-          value: false,
-          onChange: () => {
-            console.debug(`selected value: ${options[0]}`);
-          },
-          type: WhisperComponentType.Checkbox,
-        },
-        {
-          label: `${options[1]}  
-            this is a longer line one, it was known for being long 
-            99.2 %`,
-          value: false,
-          onChange: () => {
-            console.debug(`selected value: ${options[1]}`);
-          },
-          type: WhisperComponentType.Checkbox,
-        },
-        {
-          label: `Single Line Example that is extremely 
-            long extremely long extremely long extremely 
-            long extremely long extremely long extremely long extremely 
-            long extremely long extremely long extremely long extremely 
-            long extremely long extremely long`,
-          value: false,
-          onChange: () => {
-            // do nothing.
-          },
-          type: WhisperComponentType.Checkbox,
-        },
-        {
-          label: `normal label with no surprises`,
-          value: false,
-          onChange: () => {
-            // do nothing.
-          },
-          type: WhisperComponentType.Checkbox,
-        },
-        {
-          onSelect: (selected) => {
-            console.log(`${selected} has been selected!`);
-          },
-          options: [
-            'no markdown',
-            '**Strong Option**',
-            `multiline  
-              line 1  
-              line 2`,
-          ],
-          selected: 0,
-          type: WhisperComponentType.RadioGroup,
-        },
-        resolveRejectButtons(resolve, reject),
+          type: WhisperComponentType.Audio,
+          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          volume: AudioVolume.Low,
+        }
       ],
+    });
+
+    // space bar listener
+    const hotkeys: keyboard.Hotkey = {
+      key: ' '
+    };
+
+    await keyboard.listenHotkey(hotkeys, (pressed) => {
+      if (pressed) {
+        if (firstDisplayed) {
+          createdWhisper.update({
+            components: [
+              {
+                body: markdown2,
+                type: WhisperComponentType.Markdown,
+              },
+              {
+                type: WhisperComponentType.Audio,
+                url: 'https://www.soundjay.com/mechanical/gun-gunshot-01.mp3',
+                volume: AudioVolume.Medium,
+              }
+            ]
+          });
+          firstDisplayed = false;
+        } else {
+          createdWhisper.update({
+            components: [
+              {
+                body: markdown1,
+                type: WhisperComponentType.Markdown,
+              },
+              {
+                type: WhisperComponentType.Audio,
+                url: 'https://www.soundjay.com/mechanical/gun-trigger-click-01.mp3',
+                volume: AudioVolume.High,
+              }
+            ]
+          });
+          firstDisplayed = true;
+        }
+      }
     });
   });
 

@@ -112,6 +112,8 @@ export function mapToInternalChildComponent(
     case WhisperComponentType.Markdown:
     case WhisperComponentType.Message:
       return component;
+    case WhisperComponentType.Audio:
+      return component;
     case WhisperComponentType.Number:
       if (component.id && component.value) {
         stateMap.set(component.id, component.value);

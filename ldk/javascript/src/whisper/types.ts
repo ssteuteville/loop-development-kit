@@ -64,6 +64,16 @@ export enum WhisperComponentType {
    * The field can be pre-populated by the loop.
    */
   DateTimeInput = 'dateTimeInput',
+  /**
+   * to play sounds
+   */
+  Audio = 'audio',
+}
+
+export enum AudioVolume {
+  Low = 'low',
+  Medium = 'Medium',
+  High = 'High',
 }
 
 export enum JustifyContent {
@@ -233,6 +243,11 @@ export type Message = WhisperComponent<WhisperComponentType.Message> & {
   tooltip?: string;
 };
 
+export type Audio = WhisperComponent<WhisperComponentType.Audio> & {
+  url: string,
+  volume: AudioVolume,
+};
+
 export type Divider = WhisperComponent<WhisperComponentType.Divider>;
 
 export type ChildComponents =
@@ -250,7 +265,8 @@ export type ChildComponents =
   | Select
   | Telephone
   | TextInput
-  | DateTimeInput;
+  | DateTimeInput
+  | Audio;
 
 export type CollapseBox = WhisperComponent<WhisperComponentType.CollapseBox> & {
   children: Array<ChildComponents>;

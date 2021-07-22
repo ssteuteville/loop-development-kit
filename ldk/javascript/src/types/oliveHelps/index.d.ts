@@ -313,7 +313,8 @@ declare namespace OliveHelps {
     | 'select'
     | 'telephone'
     | 'textInput'
-    | 'dateTimeInput';
+    | 'dateTimeInput'
+    | 'audio';
 
   type Urgency = 'error' | 'none' | 'success' | 'warning';
 
@@ -396,6 +397,11 @@ declare namespace OliveHelps {
     tooltip?: string;
   };
 
+  type Audio = Component<'audio'> & {
+    url: string;
+    volume: string;
+  };
+
   type Email = InputComponent<'email', string>;
 
   type Password = InputComponent<'password', string>;
@@ -470,7 +476,8 @@ declare namespace OliveHelps {
     | Select
     | Telephone
     | TextInput
-    | DateTimeInput;
+    | DateTimeInput
+    | Audio;
 
   type Components = ChildComponents | CollapseBox;
 
