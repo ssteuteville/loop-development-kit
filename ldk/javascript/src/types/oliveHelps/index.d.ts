@@ -301,6 +301,7 @@ declare namespace OliveHelps {
     | 'button'
     | 'checkbox'
     | 'collapseBox'
+    | 'racetrack'
     | 'divider'
     | 'email'
     | 'link'
@@ -441,6 +442,7 @@ declare namespace OliveHelps {
   };
 
   type Divider = Component<'divider'>;
+  type Racetrack = Component<'racetrack'>;
 
   type CollapseBox = Component<'collapseBox'> & {
     children: Array<ChildComponents>;
@@ -461,6 +463,7 @@ declare namespace OliveHelps {
     | Button
     | Checkbox
     | Divider
+    | Racetrack
     | Email
     | Link
     | ListPair

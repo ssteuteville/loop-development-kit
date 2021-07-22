@@ -38,6 +38,7 @@ export enum WhisperComponentType {
    * The password input field allows the user to provide a password. This field protects the user by obscuring what they type. Showing each character as a solid black dot.
    */
   Password = 'password',
+  Racetrack = 'racetrack',
   /**
    * The radio group allows a loop to provide the user with a collection of options in which they select a single result. The result is selected by clicking one of the radio elements in the radio group.
    *
@@ -246,10 +247,13 @@ export type Message = WhisperComponent<WhisperComponentType.Message> & {
 
 export type Divider = WhisperComponent<WhisperComponentType.Divider>;
 
+export type Racetrack = WhisperComponent<WhisperComponentType.Racetrack>;
+
 export type ChildComponents =
   | Button
   | Checkbox
   | Divider
+  | Racetrack
   | Email
   | Link
   | ListPair
