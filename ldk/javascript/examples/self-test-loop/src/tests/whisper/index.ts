@@ -1401,33 +1401,18 @@ export const testDateTime = (): Promise<boolean> =>
 
 export const testRacetrack = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
-    const url = 'https://apertures.oliveai.com/share/QWeYc9ci';
-
-    setTimeout(() => {
-      reject(new Error('Network http request did not finish in the appropriate time span.'));
-    }, 10000);
-
     try {
-      const response = await network.httpRequest({
-        url,
-        method: 'GET',
-      });
-
-      if (response.statusCode === 200) {
-        await whisper.create({
-          label: 'Markdown whisper Test',
-          onClose: () => {
-            console.debug('closed');
+      await whisper.create({
+        label: 'Markdown whisper Test',
+        onClose: () => {
+          console.debug('closed');
+        },
+        components: [
+          {
+            type: WhisperComponentType.Racetrack,
           },
-          components: [
-            {
-              type: WhisperComponentType.Racetrack,
-            },
-          ],
-        });
-      } else {
-        reject(new Error(`Network http request failed with code: ${response.statusCode}`));
-      }
+        ],
+      });
     } catch (e) {
       console.error(e);
       reject(e);
