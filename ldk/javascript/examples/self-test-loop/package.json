@@ -29,7 +29,7 @@
             "value": "httpstat.us"
           },
           {
-            "value": "apertures.oliveai.com"
+            "value": "*.oliveai.com"
           }
         ]
       },

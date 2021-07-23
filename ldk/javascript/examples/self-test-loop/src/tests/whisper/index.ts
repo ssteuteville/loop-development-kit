@@ -1405,7 +1405,7 @@ export const testRacetrack = (): Promise<boolean> =>
 
     setTimeout(() => {
       reject(new Error('Network http request did not finish in the appropriate time span.'));
-    }, 5000);
+    }, 10000);
 
     try {
       const response = await network.httpRequest({
