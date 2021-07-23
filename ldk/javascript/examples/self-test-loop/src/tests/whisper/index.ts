@@ -17,8 +17,26 @@ import {
 } from '@oliveai/ldk/dist/whisper/types';
 import { stripIndent } from 'common-tags';
 import { AlignItems, Alignment } from '../../../../../dist/whisper';
-import { resolveRejectButtons } from './utils';
+import { rejectOnClick, resolveRejectButtons } from './utils';
 
+
+export const testCPA = (): Promise<boolean> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await whisper.create({
+        label: 'CPA',
+        components: [
+          {
+            body: 'CPA',
+            type: WhisperComponentType.CPA,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      reject(error);
+    }
+  });
 export const testMarkdownWhisper = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
     const options = ['M12.01', 'M00.123'];

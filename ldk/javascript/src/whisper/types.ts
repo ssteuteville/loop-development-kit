@@ -64,6 +64,7 @@ export enum WhisperComponentType {
    * The field can be pre-populated by the loop.
    */
   DateTimeInput = 'dateTimeInput',
+  CPA = 'cpa',
 }
 
 export enum JustifyContent {
@@ -253,6 +254,9 @@ export type Message = WhisperComponent<WhisperComponentType.Message> & {
   textAlign?: TextAlign;
   tooltip?: string;
 };
+export type CPA = WhisperComponent<WhisperComponentType.CPA> & {
+  body: string;
+};
 
 export type Divider = WhisperComponent<WhisperComponentType.Divider>;
 
@@ -271,6 +275,7 @@ export type ChildComponents =
   | Select
   | Telephone
   | TextInput
+  | CPA
   | DateTimeInput;
 
 export type CollapseBox = WhisperComponent<WhisperComponentType.CollapseBox> & {

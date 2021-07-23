@@ -149,4 +149,10 @@ export const whisperTestGroup = (): TestGroup =>
       10000,
       'Pick date and time values',
     ),
+    new LoopTest(
+      'Whisper Aptitude - CPA',
+      whisperTests.testCPA,
+      10000,
+      'test CPA',
+    )
   ]);

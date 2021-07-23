@@ -110,6 +110,8 @@ export function mapToInternalChildComponent(
     case WhisperComponentType.Divider:
     case WhisperComponentType.ListPair:
     case WhisperComponentType.Markdown:
+    case WhisperComponentType.CPA:
+        return component;
     case WhisperComponentType.Message:
       return component;
     case WhisperComponentType.Number:
