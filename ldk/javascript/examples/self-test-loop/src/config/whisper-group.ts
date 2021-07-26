@@ -152,7 +152,7 @@ export const whisperTestGroup = (): TestGroup =>
     new LoopTest(
       'Whisper Aptitude - Racetrack',
       whisperTests.testRacetrack,
-      10000,
-      'Pick date and time values',
+      30000,
+      'Verify Pi is Loaded',
     ),
   ]);

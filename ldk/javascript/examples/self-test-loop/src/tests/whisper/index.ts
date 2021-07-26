@@ -1403,7 +1403,7 @@ export const testRacetrack = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
     try {
       await whisper.create({
-        label: 'Markdown whisper Test',
+        label: 'Pi whisper Test',
         onClose: () => {
           console.debug('closed');
         },
@@ -1411,6 +1411,7 @@ export const testRacetrack = (): Promise<boolean> =>
           {
             type: WhisperComponentType.Racetrack,
           },
+          resolveRejectButtons(resolve, reject, 'Pi Loaded', 'Pi Failed to Load'),
         ],
       });
     } catch (e) {
