@@ -1,88 +1,10 @@
 import { TextEncoder, TextDecoder } from 'text-encoding-shim';
-import * as mapper from '../utils/mapper';
-import { Cancellable } from '../cancellable';
-import { promisifyMappedWithParam } from '../promisify';
+import * as mapper from './mapper';
+import { promisifyMappedBothWithParams, promisifyMappedWithParam } from '../promisify';
+import { stripBom } from './utils';
+import { HTTPRequest, HTTPResponse, Socket, SocketConfiguration } from './types';
 
-/**
- * The HTTP Request configuration.
- */
-export interface HTTPRequest {
-  body?: Uint8Array;
-  headers?: Record<string, string[]>;
-  method: string;
-  url: string;
-}
-
-/**
- * The HTTP Response data.
- */
-export interface HTTPResponse {
-  statusCode: number;
-  /**
-   * The HTTP response as a byte array. To decode into a UTF-8 string you can:
-   * ```
-   let decodedText = network.decode(data);
-   * ```
-   */
-  body: Uint8Array;
-  headers: Record<string, string[]>;
-}
-
-/**
- * A simplified representation of a callback which take error
- */
-export type CallbackError = (error: Error | undefined) => void;
-
-/**
- * Configuration object to configure a websocket handshake
- */
-export interface SocketConfiguration {
-  /**
-   * Websocket server endpoint url: '{schema}://{host}:{port}' - schema could be ws or wss
-   */
-  url: string;
-  /**
-   * Collection of the handshake headers
-   */
-  headers?: Record<string, string[]>;
-  /**
-   * Specifies if compression is used
-   */
-  useCompression?: boolean;
-  /**
-   * Specifies the client's requested subprotocols
-   */
-  subprotocols?: Array<string>;
-}
-
-/**
- * Object to communicate with the websocket
- */
-export interface Socket {
-  /**
-   * Writes message to a websocket
-   * @param message Text or data message
-   */
-  writeMessage(message: string | Uint8Array): Promise<void>;
-  /**
-   * Closes websocket
-   */
-  close(): Promise<void>;
-  /**
-   * Allows to listen for a websocket message (there must be only one listener registered per socket for messages to be fully received)
-   * @param handler Receives text or data message from websocket and error if occurs (error could be returned if reading from the closed connection)
-   */
-  setMessageHandler: (
-    handler: (error: Error | undefined, message: string | Uint8Array) => void,
-  ) => Promise<Cancellable>;
-  /**
-   * Allows to provide handler when websocket closing
-   * @param handler Receives code status and text received from the peer
-   */
-  setCloseHandler(
-    handler: (error: Error | undefined, code: number, text: string) => void,
-  ): Promise<void>;
-}
+export * from './types';
 
 /**
  * The Network Aptitude provides access to network calls through Olive Helps
@@ -114,7 +36,7 @@ export interface Network {
 
   /**
    *  Connects to a specified websocket
-   * 
+   *
    * @param socketConfiguration A configuration object defines websocket
    * @returns A promise with Socket
    */
@@ -122,14 +44,9 @@ export interface Network {
 }
 
 export function httpRequest(request: HTTPRequest): Promise<HTTPResponse> {
-  const bodyData = request.body ? [...request.body] : undefined;
-  return promisifyMappedWithParam(
-    {
-      body: bodyData,
-      headers: request.headers,
-      method: request.method,
-      url: request.url,
-    },
+  return promisifyMappedBothWithParams(
+    request,
+    mapper.mapToHttpRequest,
     mapper.mapToHttpResponse,
     oliveHelps.network.httpRequest,
   );
@@ -149,7 +66,7 @@ export function encode(text: string): Promise<Uint8Array> {
 export function decode(encodedValue: Uint8Array): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     try {
-      resolve(new TextDecoder().decode(encodedValue));
+      resolve(new TextDecoder().decode(stripBom(encodedValue)));
     } catch (e) {
       console.log(e);
       reject(e);

@@ -1,11 +1,10 @@
-name: Build and Deploy Node/Javascript Documents
+name: Build and Deploy Javascript Documents
 
 
 on:
   push:
     branches:
       - main
-      - SIDE-2327-landing-page-update
 
 jobs:
   deploy-developer-hub:
@@ -37,13 +36,6 @@ jobs:
         with:
           node-version: 14.x
 
-      # Build node docs
-      - run: |
-          cd ./ldk/node
-          npm ci
-          npm run build
-          npm run doc
-
       # Build javascript docs
       - run: |
           cd ./ldk/javascript
@@ -55,7 +47,6 @@ jobs:
       - run: |
           cd ./ldk
           mkdir typedoc-tmp
-          cp -r ./node/docs typedoc-tmp/node
           cp -r ./javascript/docs typedoc-tmp/javascript
           cp -r ./javascript/readme_assets typedoc-tmp/javascript
 

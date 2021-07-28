@@ -1,47 +1,48 @@
 /* eslint-disable-next-line */ // Keeping type for future expansion.
-export interface LdkAptitude {
-}
+export interface LdkAptitude {}
 
 export interface LdkValue {
-    value: string
+  value: string;
 }
 
 export interface LdkFilesystem {
-    pathGlobs:  LdkValue[]
+  pathGlobs: LdkValue[];
 }
 
 export interface LdkNetwork {
-    urlDomains: LdkValue[]
+  urlDomains: LdkValue[];
 }
 
 export interface LdkPermissions {
-    clipboard: LdkAptitude
+  clipboard: LdkAptitude;
 
-    cursor: LdkAptitude
+  cursor: LdkAptitude;
 
-    filesystem: LdkFilesystem
+  filesystem: LdkFilesystem;
 
-    keyboard: LdkAptitude
+  keyboard: LdkAptitude;
 
-    network: LdkNetwork
+  network: LdkNetwork;
 
-    process: LdkAptitude
+  process: LdkAptitude;
 
-    ui: LdkAptitude
+  system: LdkAptitude;
 
-    user: LdkAptitude
+  ui: LdkAptitude;
 
-    vault: LdkAptitude
+  user: LdkAptitude;
 
-    whisper: LdkAptitude
+  vault: LdkAptitude;
 
-    window: LdkAptitude
+  whisper: LdkAptitude;
+
+  window: LdkAptitude;
 }
 
 export interface Ldk {
-    permissions: LdkPermissions
+  permissions: LdkPermissions;
 }
 
 export interface LdkSettings {
-    ldk: Ldk
+  ldk: Ldk;
 }

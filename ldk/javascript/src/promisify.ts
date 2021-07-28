@@ -8,18 +8,17 @@ function handleCaughtError(reject: (reason?: any) => void, error: Error) {
   reject(error);
 }
 
-export function promisifyMappedWithParam<TParam, TInternalOut, TExternalOut>(
-  param: TParam,
+export function promisifyMappedBothWithParams<TParamIn, TParamOut, TInternalOut, TExternalOut>(
+  param: TParamIn,
+  paramMap: Mapper<TParamIn, TParamOut>,
   map: Mapper<TInternalOut, TExternalOut>,
-  arg: OliveHelps.ReadableWithParam<TParam, TInternalOut>,
+  arg: OliveHelps.ReadableWithParam<TParamOut, TInternalOut>,
 ): Promise<TExternalOut> {
   return new Promise((resolve, reject) => {
     try {
-      arg(param, (error, value) => {
+      arg(paramMap(param), (error, value) => {
         if (error) {
-          console.error(
-            `Received error on result: ${error.message}`,
-          );
+          console.error(`Received error on result: ${error.message}`);
           reject(error);
           return;
         }
@@ -31,6 +30,14 @@ export function promisifyMappedWithParam<TParam, TInternalOut, TExternalOut>(
   });
 }
 
+export function promisifyMappedWithParam<TParam, TInternalOut, TExternalOut>(
+  param: TParam,
+  map: Mapper<TInternalOut, TExternalOut>,
+  arg: OliveHelps.ReadableWithParam<TParam, TInternalOut>,
+): Promise<TExternalOut> {
+  return promisifyMappedBothWithParams(param, (x) => x, map, arg);
+}
+
 function promiseResolver<T>(
   resolve: (value: T | PromiseLike<T>) => void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,9 +45,7 @@ function promiseResolver<T>(
 ): (error: Error | undefined, value: T) => void {
   return (error, value) => {
     if (error) {
-      console.error(
-        `Received error on result: ${error.message}`,
-      );
+      console.error(`Received error on result: ${error.message}`);
       reject(error);
       return;
     }
@@ -52,6 +57,19 @@ export function promisify<T>(arg: OliveHelps.Readable<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     try {
       arg(promiseResolver(resolve, reject));
+    } catch (e) {
+      handleCaughtError(reject, e);
+    }
+  });
+}
+
+export function promisifyWithParamAfterCallback<TParam, TOut>(
+  param: TParam,
+  arg: OliveHelps.ReadableWithParamAfterCallback<TOut, TParam>,
+): Promise<TOut> {
+  return new Promise((resolve, reject) => {
+    try {
+      arg(promiseResolver(resolve, reject), param);
     } catch (e) {
       handleCaughtError(reject, e);
     }
@@ -134,6 +152,27 @@ export function promisifyListenableWithParam<TParam, TOut>(
       arg(param, handleListenerCallback(cb), (obj) => {
         resolve(obj);
       });
+    } catch (e) {
+      handleCaughtError(reject, e);
+    }
+  });
+}
+
+export function promisifyMappedListenableWithParam<TParam, TInternalOut, TExternalOut>(
+  param: TParam,
+  map: Mapper<TInternalOut, TExternalOut>,
+  cb: (v: TExternalOut) => void,
+  arg: OliveHelps.ListenableWithParam<TParam, TInternalOut>,
+): Promise<Cancellable> {
+  return new Promise((resolve, reject) => {
+    try {
+      arg(
+        param,
+        handleListenerCallback((value) => cb(map(value))),
+        (obj) => {
+          resolve(obj);
+        },
+      );
     } catch (e) {
       handleCaughtError(reject, e);
     }

@@ -1,18 +1,17 @@
 import { LdkSettings } from './ldk-settings';
 
-const permissionsErrorMessage =
-`Please add a "ldk" object to your package.json file with a permission property:
+const permissionsErrorMessage = `Please add a "ldk" object to your package.json file with a permission property:
     "ldk": {
         "permissions": {}
     }
-See README for more information.`
+See README for more information.`;
 
 export function generateMetadata(ldkSettings: LdkSettings): string {
-  if(!ldkSettings || !ldkSettings.ldk || Object.keys(ldkSettings.ldk).length === 0) {
+  if (!ldkSettings || !ldkSettings.ldk || Object.keys(ldkSettings.ldk).length === 0) {
     throw new Error(permissionsErrorMessage);
   }
   const json = JSON.stringify({
-    oliveHelpsContractVersion: '0.1.1',
+    oliveHelpsContractVersion: '0.1.2',
     permissions: {
       clipboard: ldkSettings.ldk.permissions.clipboard || undefined,
       cursor: ldkSettings.ldk.permissions.cursor || undefined,
@@ -20,6 +19,7 @@ export function generateMetadata(ldkSettings: LdkSettings): string {
       keyboard: ldkSettings.ldk.permissions.keyboard || undefined,
       network: ldkSettings.ldk.permissions.network || undefined,
       process: ldkSettings.ldk.permissions.process || undefined,
+      system: ldkSettings.ldk.permissions.system || undefined,
       ui: ldkSettings.ldk.permissions.ui || undefined,
       user: ldkSettings.ldk.permissions.user || undefined,
       vault: ldkSettings.ldk.permissions.vault || undefined,

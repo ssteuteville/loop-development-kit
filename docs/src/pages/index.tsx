@@ -13,6 +13,12 @@ import { getAptitudeDataFromQuery, IAllAptitudeQuery, IAllFileQuery } from '../q
 import { V2Menu } from '../components/menu/v2menu';
 import { Image } from '../components/image';
 
+declare global {
+  interface Window {
+    gtag: any;
+  }
+}
+
 interface LanguageBlockProps {
   language: string;
   repoURL: string;
@@ -59,7 +65,9 @@ export default function Home(
   const aptitudeItems = combinedData.map((aptitude) => {
     return <AptitudeItem aptitude={aptitude} key={aptitude.name} />;
   });
-  const guideItems = mapGuidePages(props.data).filter(x => !x.slug.includes('getting-started')).map((guide) => <GuideItem {...guide} />);
+  const guideItems = mapGuidePages(props.data)
+    .filter((x) => !x.slug.includes('getting-started'))
+    .map((guide) => <GuideItem {...guide} />);
   const title = <>Welcome To the Olive Helps Developer Hub</>;
   return (
     <Layout>
@@ -70,13 +78,25 @@ export default function Home(
           the Loop Developer Kit (LDK).
         </p>
         <div className={styles.headerActions}>
-          <Link className={styles.button} to="guides/getting-started">Get started</Link>
-          <a
-            className={[styles.buttonInverse, styles.buttonArrow].join(' ')}
-            href="https://www.npmjs.com/package/@oliveai/ldk"
+          <Link className={styles.button} to="guides/getting-started">
+            Get started
+          </Link>
+          <span
+            onClick={() => {
+              window.gtag('event', 'Link out', {
+                event_category: 'Navigation',
+                event_label: 'NPM',
+                value: 0,
+              });
+            }}
           >
-            Access the LDK
-          </a>
+            <a
+              className={[styles.buttonInverse, styles.buttonArrow].join(' ')}
+              href="https://www.npmjs.com/package/@oliveai/ldk"
+            >
+              Access the LDK
+            </a>
+          </span>
         </div>
       </PageHeader>
       <Section sectionClassName={styles.sectionHeroBackground}>
@@ -86,15 +106,29 @@ export default function Home(
           Loop Library to become a Loop Author and get building.
         </p>
         <div className={styles.downloadCollection}>
-          <article className={styles.downloadItem}>
-            <a href={downloadWindowsUrl}>
-              Windows
-            </a>
+          <article
+            className={styles.downloadItem}
+            onClick={() => {
+              window.gtag('event', 'Download Olive Helps', {
+                event_category: 'Downloads',
+                event_label: 'Windows',
+                value: 0,
+              });
+            }}
+          >
+            <a href={downloadWindowsUrl}>Windows</a>
           </article>
-          <article className={styles.downloadItem}>
-            <a href={downloadMacUrl}>
-              Mac
-            </a>
+          <article
+            className={styles.downloadItem}
+            onClick={() => {
+              window.gtag('event', 'Download Olive Helps', {
+                event_category: 'Downloads',
+                event_label: 'Mac',
+                value: 0,
+              });
+            }}
+          >
+            <a href={downloadMacUrl}>Mac</a>
           </article>
         </div>
       </Section>
@@ -114,8 +148,21 @@ export default function Home(
         <p className={styles.sectionDescription}>
           Create beautiful Loops that seamlessly integrated with Olive Helps.
         </p>
-        <p className={styles.sectionDescription}>
-          <a href="https://coda.io/@olive-helps-design/design-system" target="_blank" className={styles.buttonInversePadding}>
+        <p
+          className={styles.sectionDescription}
+          onClick={() => {
+            window.gtag('event', 'Link out', {
+              event_category: 'Navigation',
+              event_label: 'Design System',
+              value: 0,
+            });
+          }}
+        >
+          <a
+            href="https://coda.io/@olive-helps-design/design-system"
+            target="_blank"
+            className={styles.buttonInversePadding}
+          >
             View the design system
           </a>
         </p>
@@ -128,8 +175,20 @@ export default function Home(
           <p className={styles.needHelpSubtext}>
             Submit a request or email your Olive Helps developer contact for further assistance.
           </p>
-          <div>
-            <a href="https://github.com/open-olive/loop-development-kit/issues" className={styles.button} target="_blank">
+          <div
+            onClick={() => {
+              window.gtag('event', 'Link out', {
+                event_category: 'Navigation',
+                event_label: 'Support',
+                value: 0,
+              });
+            }}
+          >
+            <a
+              href="https://github.com/open-olive/loop-development-kit/issues"
+              className={styles.button}
+              target="_blank"
+            >
               Submit a request
             </a>
           </div>
@@ -167,14 +226,14 @@ export default function Home(
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src={'socialmedia-instagram.svg'} className={styles.footerSocialMediaImage}/>
+              <Image src={'socialmedia-instagram.svg'} className={styles.footerSocialMediaImage} />
             </a>
             <a
               href="https://www.linkedin.com/company/oliveai"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src={'socialmedia-linkedin.svg'} className={styles.footerSocialMediaImage}/>
+              <Image src={'socialmedia-linkedin.svg'} className={styles.footerSocialMediaImage} />
             </a>
           </div>
         </div>
