@@ -59,4 +59,10 @@ export const filesystemTestGroup = (): TestGroup =>
       5000,
       'Checking for file info being returned...',
     ),
+    new LoopTest(
+      'File Aptitude - File OCR',
+      filesystemTests.testOcr,
+      20000,
+      'Look at the console for data...',
+    ),
   ]);

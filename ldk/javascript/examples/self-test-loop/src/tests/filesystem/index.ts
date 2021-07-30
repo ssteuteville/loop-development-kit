@@ -352,3 +352,16 @@ export const testFileStat = (): Promise<boolean> =>
       reject(error);
     }
   });
+
+  export const testOcr = (): Promise<boolean> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await filesystem.ocr('home');
+
+      resolve(true);
+    } catch (error) {
+      console.error(error);
+
+      reject(error);
+    }    
+  });
