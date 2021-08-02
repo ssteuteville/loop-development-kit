@@ -186,8 +186,7 @@ An Aptitude Name.
 | :--- | :--- | :--- |
 
 
-"clipboard" \| "cursor" \| "keyboard" "process" \| "ui" \| "user" "vault" \| "whisper" \| "window"   
-
+"clipboard" \| "cursor" \| "keyboard" "process" \| "ui" \| "user" "vault" \| "whisper" \| "window"
 
 ## Loop Examples
 
