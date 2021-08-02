@@ -1,6 +1,7 @@
 root: ./ldk/javascript
 
 ​structure:  
-    readme: ./docs/README.md
-    summary: ./docs/global.md
+    readme: README.md  
     
+redirects:  
+    previous/page: new-folder/page.md
