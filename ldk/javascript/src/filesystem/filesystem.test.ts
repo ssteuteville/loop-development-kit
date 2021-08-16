@@ -18,6 +18,7 @@ describe('Filesystem', () => {
       join: jest.fn(),
       unzip: jest.fn(),
       openWithDefaultApplication: jest.fn(),
+      ocr: jest.fn(),
     };
   });
 
