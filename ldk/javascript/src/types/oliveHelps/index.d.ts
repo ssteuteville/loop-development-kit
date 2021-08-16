@@ -265,6 +265,11 @@ declare namespace OliveHelps {
     info: FileInfo;
   }
 
+  interface OCRResult {
+    confidence: number;
+    text: string;
+  }
+
   type WriteMode = number;
 
   type WriteOperationOverwrite = 1;
@@ -299,6 +304,8 @@ declare namespace OliveHelps {
     unzip: ReadableWithTwoParams<string, string, void>;
 
     openWithDefaultApplication: ReadableWithParam<string, void>;
+
+    ocr: ReadableWithParam<number, OCRResult[]>;
   }
 
   //-- Whisper
