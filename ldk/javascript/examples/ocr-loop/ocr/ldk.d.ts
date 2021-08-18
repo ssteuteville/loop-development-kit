@@ -5,7 +5,7 @@ declare const oliveHelps: OliveHelps.Aptitudes;
 
 declare namespace OliveHelps {
   interface Aptitudes {
-    filesystem: Filesystem;
+    screen: Screen;
   }
 
   interface OCRResult {
@@ -13,7 +13,7 @@ declare namespace OliveHelps {
     text: string;
   }
 
-  interface Filesystem {
+  interface Screen {
     ocr: (
       boundingBoxType: number,
       callback: (error: Error | undefined, value: OCRResult[]) => void,

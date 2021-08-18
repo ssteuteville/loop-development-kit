@@ -1,10 +1,12 @@
-export const processOcr = (boundingBoxType: number): Promise<OliveHelps.OCRResult[]> => {
-    return new Promise((resolve, reject) => {
-        oliveHelps.filesystem.ocr(boundingBoxType, (error: Error | undefined, ocrResults: OliveHelps.OCRResult[]) => {
-            if (error) {
-                reject(error);
-            }
-            resolve(ocrResults);
-        });
-    });
-}
+export const processOcr = (boundingBoxType: number): Promise<OliveHelps.OCRResult[]> =>
+  new Promise((resolve, reject) => {
+    oliveHelps.screen.ocr(
+      boundingBoxType,
+      (error: Error | undefined, ocrResults: OliveHelps.OCRResult[]) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(ocrResults);
+      },
+    );
+  });
