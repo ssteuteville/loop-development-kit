@@ -93,7 +93,7 @@ export const emitOcrRequestWhisper = async (): Promise<void> => {
               const ocrResults = await processOcr(boundingBoxType);
               var end = new Date().getTime();
               console.info(`Ending OCR process`);
-              console.info(`OCR process time: ${(end - start)/1000} sec`);
+              console.info(`OCR process time: ${(end - start) / 1000} sec`);
 
               ocrResults.forEach((ocrResult) => {
                 console.info(

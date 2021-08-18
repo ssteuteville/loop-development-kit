@@ -10,7 +10,7 @@ import * as ui from './ui';
 import * as user from './user';
 import * as vault from './vault';
 import * as whisper from './whisper';
-import * as window from './window'; 
+import * as window from './window';
 
 // These are provided to validate that the aptitude object meets the interface contract.
 /* eslint-disable */ const _clipboard: clipboard.Clipboard = clipboard;
