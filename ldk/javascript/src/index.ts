@@ -11,6 +11,7 @@ import * as user from './user';
 import * as vault from './vault';
 import * as whisper from './whisper';
 import * as window from './window'; // These are provided to validate that the aptitude object meets the interface contract.
+import * as lifecycle from './lifecycle';
 
 /* eslint-disable */ const _clipboard: clipboard.Clipboard = clipboard;
 const _cursor: cursor.Cursor = cursor;
@@ -24,6 +25,7 @@ const _user: user.User = user;
 const _vault: vault.Vault = vault;
 const _whisper: whisper.WhisperAptitude = whisper;
 const _window: window.Window = window;
+const _lifecycle: lifecycle.Lifecycle = lifecycle;
 /* eslint-enable */
 
 export {
@@ -39,4 +41,5 @@ export {
   vault,
   whisper,
   window,
+  lifecycle
 };

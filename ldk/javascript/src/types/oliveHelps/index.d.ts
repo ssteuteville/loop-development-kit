@@ -17,6 +17,7 @@ declare namespace OliveHelps {
     user: User;
     vault: Vault;
     window: Window;
+    lifecycle: Lifecycle;
   }
 
   interface Cancellable {
@@ -520,6 +521,10 @@ declare namespace OliveHelps {
     | SectionTitle;
 
   type Components = ChildComponents | CollapseBox;
+
+  interface Lifecycle {
+    onStart: () => void;
+  }
 
   interface NewWhisper {
     label: string;
