@@ -385,6 +385,7 @@ declare namespace OliveHelps {
     | 'number'
     | 'password'
     | 'radioGroup'
+    | 'richTextEditor'
     | 'select'
     | 'sectionTitle'
     | 'telephone'
@@ -555,6 +556,14 @@ declare namespace OliveHelps {
     selected?: number;
   };
 
+  type RichTextEditor = Component<'richTextEditor'> & {
+    onBlur?: (error: Error | undefined) => void;
+    onChange: WhisperHandlerWithParam<string>;
+    onFocus?: (error: Error | undefined) => void;
+    tooltip?: string;
+    validationError?: string;
+  };
+
   type Checkbox = SelectComponent<'checkbox'> & {
     label: string;
     tooltip?: string;
@@ -624,6 +633,7 @@ declare namespace OliveHelps {
     | NumberInput
     | Password
     | RadioGroup
+    | RichTextEditor
     | Select
     | Telephone
     | TextInput

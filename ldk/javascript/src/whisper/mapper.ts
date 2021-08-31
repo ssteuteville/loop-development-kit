@@ -216,6 +216,16 @@ export function mapToInternalChildComponent(
           component.onSelect(error, param, mapToExternalWhisper(whisper, stateMap));
         },
       } as OliveHelps.RadioGroup;
+    case WhisperComponentType.RichTextEditor:
+      return {
+        ...component,
+        onChange: (error, param, whisper) => {
+          if (component.id) {
+            stateMap.set(component.id, param);
+          }
+          component.onChange(error, param, mapToExternalWhisper(whisper, stateMap));
+        },
+      } as OliveHelps.RichTextEditor;
     case WhisperComponentType.Select:
       if (component.id && component.selected) {
         stateMap.set(component.id, component.selected);
