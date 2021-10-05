@@ -1,19 +1,9 @@
-import { clipboard, whisper } from '@oliveai/ldk';
+import { screen } from '@oliveai/ldk';
+import { BoundingBoxType } from '@oliveai/ldk/dist/screen';
 
 function clipboardListenAndWhisper() {
-  clipboard.listen(true, (incomingText) => {
-    whisper.create({
-      label: 'Clipboard Text Whisper',
-      onClose: () => {
-        console.log('Closed Clipboard Text Whisper');
-      },
-      components: [
-        {
-          body: `Got Clipboard Text: ${incomingText}`,
-          type: whisper.WhisperComponentType.Markdown,
-        },
-      ],
-    });
+  screen.ocr(BoundingBoxType.Block).then((result) => {
+    console.log(`result: ${result}`);
   });
 }
 

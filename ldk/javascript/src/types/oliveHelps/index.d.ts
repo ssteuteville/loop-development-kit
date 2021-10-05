@@ -19,5 +19,6 @@ declare namespace OliveHelps {
     vault: Vault.Aptitude;
     window: Window.Aptitude;
     document: Document.Aptitude;
+    screen: Screen.Aptitude;
   }
 }
