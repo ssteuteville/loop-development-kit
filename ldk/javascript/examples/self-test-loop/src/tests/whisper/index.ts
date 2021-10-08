@@ -2537,6 +2537,41 @@ export const testWidth = (): Promise<boolean> =>
 
 export const testScrollInsideBox = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
+    const housingTypeDropdown: whisper.Select = {
+      type: whisper.WhisperComponentType.Select,
+      id: 'housingResourceType',
+      key: 'housingResourceType',
+      label: 'Housing Resource',
+      options: [
+        'Housing Financial Assistance',
+        'Temporary Shelter',
+        'Subsidized Rentals (Section 8)',
+      ],
+      selected: 0, // housingTypeIndex(housingResourcesWhisper.getState('housingType')),
+      onSelect: async (_, param) => {
+        // removed state management for repro
+        // housingResourcesWhisper.resetState();
+        // housingResourcesWhisper.setState('housingType', indexToHousingType(param), true);
+      },
+    };
+
+    const housingTypeDropdown2: whisper.Select = {
+      type: whisper.WhisperComponentType.Select,
+      id: 'Type',
+      key: 'Type',
+      label: 'Housing Resource',
+      options: [
+        'Housing Financial Assistance',
+        'Temporary Shelter',
+        'Subsidized Rentals (Section 8)',
+      ],
+      selected: 0, // housingTypeIndex(housingResourcesWhisper.getState('housingType')),
+      onSelect: async (_, param) => {
+        // removed state management for repro
+        // housingResourcesWhisper.resetState();
+        // housingResourcesWhisper.setState('housingType', indexToHousingType(param), true);
+      },
+    };
     try {
       await whisper.create({
         label: 'Scrolling Inside Box Test',
@@ -2551,34 +2586,89 @@ export const testScrollInsideBox = (): Promise<boolean> =>
 
           {
             type: whisper.WhisperComponentType.Box,
+            justifyContent: JustifyContent.Left,
             direction: Direction.Vertical,
-            justifyContent: JustifyContent.SpaceEvenly,
-            customHeight: CustomHeight.Small,
+            // customHeight: CustomHeight.Small,
             children: [
               {
-                type: WhisperComponentType.TextInput,
-                label: 'TextInput',
-                onChange: (value) => {
-                  console.debug(`Input value changed: ${value}`);
-                },
+                type: WhisperComponentType.SectionTitle,
+                body:
+                  'This is SectionTitle within a Box Component.we will seeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
               },
+            ],
+            layout: {
+              marginTop: StyleSize.Small,
+            },
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            justifyContent: JustifyContent.Left,
+            direction: Direction.Vertical,
+            // customHeight: CustomHeight.Small,
+            children: [housingTypeDropdown],
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            justifyContent: JustifyContent.Left,
+            direction: Direction.Horizontal,
+            // customHeight: CustomHeight.Small,
+            children: [housingTypeDropdown2],
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            justifyContent: JustifyContent.Left,
+            direction: Direction.Vertical,
+            // customHeight: CustomHeight.Small,
+            children: [
               {
-                type: whisper.WhisperComponentType.Markdown,
-                body: shortText,
+                type: WhisperComponentType.RadioGroup,
+                onSelect: () => {
+                  // do nothing.
+                },
+                id: 'myRadioGroup',
+                options: ['A : RadioGroup within a Box Component', 'option B'],
               },
             ],
           },
           {
             type: whisper.WhisperComponentType.Box,
-            direction: Direction.Horizontal,
-            justifyContent: JustifyContent.SpaceEvenly,
-            customHeight: CustomHeight.Small,
+            justifyContent: JustifyContent.Left,
+            direction: Direction.Vertical,
+            // customHeight: CustomHeight.Small,
             children: [
               {
-                type: whisper.WhisperComponentType.Markdown,
-                body: stripIndent`
-              When customHeight is large enough to put all your markdown inside box. It won't scroll.`,
+                type: WhisperComponentType.Icon,
+                name: 'call',
+                size: IconSize.XLarge,
+                onClick: () => {
+                  console.info('Call Clicked');
+                },
+                tooltip: 'Phone a friend',
               },
+            ],
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            justifyContent: JustifyContent.Left,
+            direction: Direction.Horizontal,
+            // customHeight: CustomHeight.Small,
+            children: [
+              {
+                type: WhisperComponentType.Icon,
+                name: 'call',
+                size: IconSize.XLarge,
+                onClick: () => {
+                  console.info('Call Clicked');
+                },
+                tooltip: 'Phone a friend',
+              },
+            ],
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            direction: Direction.Vertical,
+            justifyContent: JustifyContent.SpaceEvenly,
+            children: [
               {
                 type: WhisperComponentType.TextInput,
                 label: 'TextInput',
