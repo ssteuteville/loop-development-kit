@@ -1,15 +1,20 @@
 import {
-  JustifyContent,
-  Direction,
-  WhisperComponentType,
-  Whisper,
-  Component,
-  StateMap,
-  Button,
-  Select,
-  TextInput,
   Autocomplete,
+  Button,
+  Component,
+  Direction,
+  Divider,
+  JustifyContent,
+  Markdown,
+  RadioGroup,
+  Select,
+  StateMap,
+  TextInput,
+  Whisper,
+  WhisperComponentType,
 } from '@oliveai/ldk/dist/whisper/types';
+
+import { WidthSize } from '@oliveai/ldk/dist/whisper';
 
 export const resolveOnClick = (
   error: Error,
@@ -76,6 +81,13 @@ export const logMap = (map: StateMap): void => {
   });
 };
 
+export const createDivider = (widthSize?: WidthSize): Divider => ({
+  type: WhisperComponentType.Divider,
+  layout: {
+    width: widthSize || WidthSize.Half,
+  },
+});
+
 export const createTextComponent = (id: string, label?: string): TextInput => ({
   type: WhisperComponentType.TextInput,
   label: label || 'Enter text',
@@ -98,6 +110,18 @@ export const createSelectComponent = (id: string, label?: string): Select => ({
   options: ['Option 1', 'Option 2'],
   tooltip: 'Select an option',
 });
+
+export const createRadioComponent = (id: string): RadioGroup => {
+  return {
+    type: WhisperComponentType.RadioGroup,
+    id: id,
+    key: id,
+    onSelect: (_error: Error, _param: number, onSelectWhisper: Whisper) => {
+      logMap(onSelectWhisper.componentState);
+    },
+    options: ['Option 1', 'Option 2'],
+  };
+};
 
 export const createAutocompleteComponent = (id: string, label?: string): Autocomplete => ({
   type: WhisperComponentType.Autocomplete,
@@ -125,6 +149,13 @@ export const createButtonComponent = (
     onClick(error, onClickWhisper);
   },
 });
+
+export const createMarkdownComponent = (text: string): Markdown => {
+  return {
+    type: WhisperComponentType.Markdown,
+    body: text,
+  };
+};
 
 export const newGuid = (): string =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

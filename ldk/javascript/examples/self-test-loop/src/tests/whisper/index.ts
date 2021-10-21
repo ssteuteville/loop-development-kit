@@ -1,29 +1,33 @@
 /* eslint-disable no-async-promise-executor */
 import { clipboard, network, whisper } from '@oliveai/ldk';
 import {
+  AlignItems,
   ButtonSize,
   ButtonStyle,
+  Color,
   Component,
   CustomHeight,
   DateTimeType,
   Direction,
   JustifyContent,
+  IconSize,
+  MessageWhisperCopyMode,
+  MarkdownWhisperCopyMode,
   NewWhisper,
+  RichTextEditor,
+  StyleSize,
   TextAlign,
   Urgency,
   Whisper,
   WhisperComponentType,
-  MessageWhisperCopyMode,
-  MarkdownWhisperCopyMode,
-  IconSize,
-  Color,
-  AlignItems,
-  RichTextEditor,
 } from '@oliveai/ldk/dist/whisper/types';
 import { stripIndent } from 'common-tags';
 import {
-  createAutocompleteComponent,
   autocompleteOptions,
+  createAutocompleteComponent,
+  createDivider,
+  createTextComponent,
+  createSelectComponent,
   logMap,
   resolveRejectButtons,
 } from './utils';
@@ -217,7 +221,7 @@ export const testMarkdownOnLinkClick = (): Promise<boolean> =>
         {
           body: markdown,
           type: WhisperComponentType.Markdown,
-          onLinkClick: (error: Error, linkName: string) => {
+          onLinkClick: (error, linkName) => {
             console.info(`Received click on the link: ${JSON.stringify(linkName)}`);
             if (linkName === 'Some Link 1') {
               onActionWrapper(error, 'SomeLink1', resolverMap, createdWhisper, resolve, reject);
@@ -434,6 +438,11 @@ export const testDropzone = async (): Promise<boolean> => {
       acceptFileData.component,
     ],
   });
+  acceptFileData.acceptResult.catch(() => {
+    testWhisper.close(() => {
+      // Do nothing.
+    });
+  });
   await acceptFileData.acceptResult;
 
   const filesWereCleared = createAcceptButtons();
@@ -444,8 +453,10 @@ export const testDropzone = async (): Promise<boolean> => {
       filesWereCleared.component,
     ],
   });
-  testWhisper.close(() => {
-    // Do nothing.
+  filesWereCleared.acceptResult.finally(() => {
+    testWhisper.close(() => {
+      // Do nothing.
+    });
   });
   return filesWereCleared.acceptResult;
 };
@@ -1269,6 +1280,7 @@ export const testDefaultValueForSelectAndRadio = (): Promise<boolean> =>
 
 export const testTooltips = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
+    const dateValue = new Date(1634145967056);
     try {
       await whisper.create({
         label: 'Are all tooltips rendered?',
@@ -1334,6 +1346,7 @@ export const testTooltips = (): Promise<boolean> =>
             onChange: () => {
               // do nothing.
             },
+            value: dateValue,
             tooltip: 'Tooltip for Date',
           },
           {
@@ -2236,6 +2249,8 @@ export const testAutocomplete = (): Promise<boolean> =>
       ['Select', false],
       ['Change', false],
       ['Multiple', false],
+      ['Custom', false],
+      ['MultiCustom', false],
     ]);
     try {
       await whisper.create({
@@ -2302,6 +2317,53 @@ export const testAutocomplete = (): Promise<boolean> =>
             tooltip: 'tooltip',
             value: '5',
           },
+          {
+            type: WhisperComponentType.Markdown,
+            body: "Enter the word 'custom'",
+          },
+          {
+            type: WhisperComponentType.Autocomplete,
+            label: 'Autocomplete Free Solo Test',
+            loading: true,
+            multiple: false,
+            freeSolo: true,
+            onChange: (error, value, onChangeWhisper) => {
+              console.log(`Received onChange value: ${JSON.stringify(value)}`);
+              if (value?.includes('custom')) {
+                onActionWrapper(error, 'Custom', resolverMap, onChangeWhisper, resolve, reject);
+              }
+            },
+            onSelect: (_error, value: string[]) => {
+              console.info(`Received onSelect value: ${JSON.stringify(value)}`);
+            },
+            options: autocompleteOptions,
+            tooltip: 'tooltip',
+          },
+          {
+            type: WhisperComponentType.Autocomplete,
+            label: 'Autocomplete Free Solo Multiple Test',
+            loading: true,
+            multiple: true,
+            freeSolo: true,
+            onChange: (error, value, onChangeWhisper) => {
+              console.log(`Received onChange value: ${JSON.stringify(value)}`);
+              if (value?.includes('custom')) {
+                onActionWrapper(
+                  error,
+                  'MultiCustom',
+                  resolverMap,
+                  onChangeWhisper,
+                  resolve,
+                  reject,
+                );
+              }
+            },
+            onSelect: (_error, value: string[]) => {
+              console.info(`Received onSelect value: ${JSON.stringify(value)}`);
+            },
+            options: autocompleteOptions,
+            tooltip: 'tooltip',
+          },
         ],
       });
     } catch (e) {
@@ -2313,6 +2375,27 @@ export const testAutocomplete = (): Promise<boolean> =>
 export const testPadding = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
     try {
+      const divider = createDivider();
+
+      const paddingSize = whisper.StyleSize.Medium;
+      const componentsToGroup = [];
+      const componentCreationFunctions = [
+        createTextComponent,
+        createSelectComponent,
+        createAutocompleteComponent,
+      ];
+
+      for (
+        let functionIndex = 0;
+        functionIndex < componentCreationFunctions.length;
+        functionIndex++
+      ) {
+        const func = componentCreationFunctions[functionIndex];
+        const component = func(`${functionIndex}`, 'Label');
+        component.layout = { padding: paddingSize };
+        componentsToGroup.push(component);
+      }
+
       await whisper.create({
         label: 'Padding Property Test',
         onClose: () => {
@@ -2387,6 +2470,42 @@ export const testPadding = (): Promise<boolean> =>
                 ],
               },
             ],
+          },
+          divider,
+          {
+            body:
+              'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
+            type: WhisperComponentType.Markdown,
+          },
+          ...componentsToGroup,
+          divider,
+          {
+            body:
+              'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
+            type: WhisperComponentType.Markdown,
+          },
+          {
+            type: whisper.WhisperComponentType.Box,
+            layout: {
+              margin: whisper.StyleSize.Small,
+            },
+            direction: Direction.Vertical,
+            justifyContent: JustifyContent.SpaceEvenly,
+            children: componentsToGroup,
+          },
+          divider,
+          {
+            body:
+              'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
+            type: WhisperComponentType.Markdown,
+          },
+          {
+            type: whisper.WhisperComponentType.CollapseBox,
+            layout: {
+              margin: whisper.StyleSize.Small,
+            },
+            open: true,
+            children: componentsToGroup,
           },
           resolveRejectButtons(resolve, reject, 'Yes', 'No'),
         ],
@@ -2736,6 +2855,47 @@ export const testJustifyContent = (): Promise<boolean> =>
           type: WhisperComponentType.Markdown,
         },
         resolveRejectButtons(resolve, reject),
+      ],
+    });
+  });
+
+export const testMissingLayouts = (): Promise<boolean> =>
+  new Promise(async (resolve, reject) => {
+    await whisper.create({
+      label: 'Did message components rendered properly',
+      onClose: () => {
+        console.debug('closed');
+      },
+      components: [
+        {
+          type: WhisperComponentType.Message,
+          layout: {
+            flex: '1',
+            marginTop: StyleSize.Medium,
+          },
+          body: 'This is a message with a top margin and flex',
+          style: Urgency.Success,
+        },
+        {
+          type: WhisperComponentType.Markdown,
+          layout: {
+            flex: '1',
+            marginTop: StyleSize.Medium,
+          },
+          body: 'This is markdown with a top margin and flex',
+        },
+        {
+          type: WhisperComponentType.ListPair,
+          layout: {
+            flex: '1',
+            marginTop: StyleSize.Medium,
+          },
+          copyable: false,
+          label: 'This is a label',
+          value: 'This is a list pair with top margin',
+          style: Urgency.None,
+        },
+        resolveRejectButtons(resolve, reject, 'Yes', 'No', true),
       ],
     });
   });
