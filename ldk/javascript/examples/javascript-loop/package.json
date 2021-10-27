@@ -12,7 +12,8 @@
   "ldk": {
     "permissions": {
       "clipboard": {},
-      "whisper": {}
+      "whisper": {},
+      "window": {}
     }
   },
   "dependencies": {
