@@ -516,4 +516,8 @@ export interface File {
    * Reads the entirety of the file.
    */
   readFile(): Promise<Uint8Array>;
+
+  retain(): Promise<void>;
+
+  revoke(): Promise<void>;
 }

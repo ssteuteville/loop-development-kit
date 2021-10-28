@@ -134,6 +134,10 @@ export interface Filesystem {
    * @returns - the fully qualified path of the Loop's working directory as a string
    */
   workDir(): Promise<string>;
+
+  getFileObject(path: string): Promise<any>;
+
+  retainedFilePaths(): Promise<Array<string>>;
 }
 
 export function copy(source: string, destination: string): Promise<void> {
@@ -221,4 +225,12 @@ export function openWithDefaultApplication(path: string): Promise<void> {
 
 export function workDir(): Promise<string> {
   return promisify(oliveHelps.filesystem.workDir);
+}
+
+export function getFileObject(path: string): Promise<any> {
+  return promisifyWithParam(path, oliveHelps.filesystem.getFileObject);
+}
+
+export function retainedFilePaths(): Promise<Array<string>> {
+  return promisify(oliveHelps.filesystem.retainedFilePaths);
 }

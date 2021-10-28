@@ -133,6 +133,24 @@ export function mapToInternalChildComponent(
           ) => ({
             path: file.path,
             size: file.size,
+            retain: () =>
+              new Promise<void>((resolve, reject) => {
+                file.retain((error1, value) => {
+                  if (error1) {
+                    return reject(error1);
+                  }
+                  resolve();
+                });
+              }),
+            revoke: () =>
+              new Promise<void>((resolve, reject) => {
+                file.revoke((error1, value) => {
+                  if (error1) {
+                    return reject(error1);
+                  }
+                  resolve();
+                });
+              }),
             readFile: () =>
               new Promise<Uint8Array>((resolve, reject) => {
                 file.readFile((readError, buffer) => {
