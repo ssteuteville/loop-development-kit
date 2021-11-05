@@ -11,7 +11,7 @@ export const testDocumentEncodeAndDecode = (): Promise<boolean> =>
           hiddenColumns: [],
           hiddenRows: [],
           name: 'name',
-          rows: [{ cells: [{ value: 'value' }] }],
+          rows: [{ cells: [{ value: 'Health Condition' }, { value: 'Good' }] }],
         },
       ],
     };
@@ -22,9 +22,9 @@ export const testDocumentEncodeAndDecode = (): Promise<boolean> =>
     try {
       const uint8ArrayData = await document.xlsxEncode(workbook);
       const actual = await document.xlsxDecode(uint8ArrayData);
-      const cellData = actual.worksheets[0].rows[0].cells[0].value;
+      const cellData = actual.worksheets[0].rows[0].cells[1].value;
 
-      if (cellData === 'value') {
+      if (cellData === 'Good') {
         resolve(true);
       } else {
         reject(
