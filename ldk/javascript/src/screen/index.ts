@@ -1,19 +1,21 @@
-// import { promisifyWithParamAfterCallback } from '../promisify';
+import { promisifyWithParam } from '../promisify';
 import { OCRResult, OCRCoordinates } from './types';
 
 export * from './types';
 
+/**
+ *  @ignore Screen aptitude allows Loops to enable Optical character recognition ability.
+ */
 export interface Screen {
-  ocr: (ocrCoordinates: OCRCoordinates) => void;
+  /**
+   * @ignore
+   * Performs screen OCR and returns recognized text ressults.
+   * @param  ocrCoordinates? - The term that will be used to identify the coordination of cursor???
+   * @returns A Promise resolving with the text results as a string.
+   */
+  ocr(ocrCoordinates?: OCRCoordinates): Promise<OCRResult[]>;
 }
 
 export function ocr(ocrCoordinates: OCRCoordinates): Promise<OCRResult[]> {
-  return new Promise((resolve, reject) => {
-    oliveHelps.screen.ocr((error: Error | undefined, ocrResults: OCRResult[]) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(ocrResults);
-    }, ocrCoordinates);
-  });
+  return promisifyWithParam(ocrCoordinates, oliveHelps.screen.ocr);
 }

@@ -21,7 +21,7 @@ describe('Generate Banner', () => {
   const ldkSettings: LdkSettings = {
     ldk: {
       permissions: {
-        browser: {},
+        browser: { urlDomains: [{ value: '*.google.com' }] },
         clipboard: {},
         cursor: {},
         document: {},
@@ -30,6 +30,7 @@ describe('Generate Banner', () => {
         network: { urlDomains: [{ value: '*.google.com' }] },
         process: {},
         search: {},
+        screen: {},
         system: {},
         ui: {},
         user: { optionalClaims: [{ value: 'email' }] },
@@ -43,9 +44,9 @@ describe('Generate Banner', () => {
   it('generates banner given valid LdkSettings', () => {
     const actual = getLoopMetadataContent(generateBanner(ldkSettings));
     const expected = {
-      oliveHelpsContractVersion: '0.1.6',
+      oliveHelpsContractVersion: '0.1.7',
       permissions: {
-        browser: {},
+        browser: { urlDomains: [{ value: '*.google.com' }] },
         clipboard: {},
         cursor: {},
         document: {},
@@ -53,6 +54,7 @@ describe('Generate Banner', () => {
         keyboard: {},
         network: { urlDomains: [{ value: '*.google.com' }] },
         process: {},
+        screen: {},
         search: {},
         system: {},
         ui: {},
@@ -81,7 +83,7 @@ describe('Generate Banner', () => {
     const actual = getLoopMetadataContent(generateBanner(ldkSettings));
 
     const expected = {
-      oliveHelpsContractVersion: '0.1.6',
+      oliveHelpsContractVersion: '0.1.7',
       permissions: {
         filesystem: { pathGlobs: [{ value: '/my/path' }] },
         network: { urlDomains: [{ value: '*.google.com' }] },
@@ -95,7 +97,7 @@ describe('Generate Banner', () => {
   it('adds oliveHelpsContractVersion', () => {
     const result = getLoopMetadataContent(generateBanner(ldkSettings));
 
-    expect(result.oliveHelpsContractVersion).toEqual('0.1.6');
+    expect(result.oliveHelpsContractVersion).toEqual('0.1.7');
   });
 
   it('throws exception when LDK permissions are not provided', () => {

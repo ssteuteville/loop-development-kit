@@ -25,6 +25,7 @@ const _filesystem: filesystem.Filesystem = filesystem;
 const _keyboard: keyboard.Keyboard = keyboard;
 const _network: network.Network = network;
 const _process: process.Process = process;
+const _screen: screen.Screen = screen;
 const _search: search.Search = search;
 const _system: system.System = system;
 const _ui: ui.UI = ui;
@@ -44,6 +45,7 @@ export {
   keyboard,
   network,
   process,
+  screen,
   search,
   system,
   ui,
