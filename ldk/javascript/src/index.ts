@@ -34,7 +34,6 @@ const _vault: vault.Vault = vault;
 const _whisper: whisper.WhisperAptitude = whisper;
 const _window: window.Window = window;
 const _document: document.Document = document;
-const _screen: screen.Screen = screen;
 /* eslint-enable */
 
 export {
@@ -54,5 +53,4 @@ export {
   whisper,
   window,
   document,
-  screen,
 };
