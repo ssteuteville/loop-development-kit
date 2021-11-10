@@ -78,14 +78,19 @@ async function performOcr() {
       height: windowInfo.height,
     };
     console.log('got active window coordinates:');
-    console.log(ocrCoordinates);
+    console.log(
+      ocrCoordinates.top,
+      ocrCoordinates.left,
+      ocrCoordinates.width,
+      ocrCoordinates.height,
+    );
     console.log('performing ocr with coordinates...');
 
     screen
       .ocr(ocrCoordinates)
       .then((result) => {
-         console.log("OCR Results: ");
-         console.log(JSON.stringify(result));
+        console.log('OCR Results: ');
+        console.log(JSON.stringify(result));
 
         console.log(rebuild_image(result));
         let resFilter = result.filter((res) => res.confidence > 75);
@@ -101,7 +106,6 @@ async function performOcr() {
 
 async function OcrLoop() {
   writeWhisper(`ocr`, `starting ocr app`);
-  // perform_ocr();
 }
 
 OcrLoop();
