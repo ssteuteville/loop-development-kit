@@ -468,6 +468,7 @@ export const testClickableButton = (): Promise<boolean> =>
       onClose: () => {
         console.debug('closed');
       },
+
       components: [
         {
           body: 'Click the correct button',
@@ -483,6 +484,13 @@ export const testClickableButton = (): Promise<boolean> =>
               onClick: () => console.debug(`Why'd you do that?`),
               type: WhisperComponentType.Button,
               size: ButtonSize.Large,
+            },
+            {
+              type: whisper.WhisperComponentType.Button,
+              label: 'First',
+              size: whisper.ButtonSize.Small,
+              buttonStyle: whisper.ButtonStyle.Text,
+              onClick: () => console.log("Text Button Style"),
             },
             {
               buttonStyle: ButtonStyle.Text,
@@ -2473,13 +2481,15 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           ...componentsToGroup,
           divider,
           {
-            body: 'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
@@ -2493,7 +2503,8 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
