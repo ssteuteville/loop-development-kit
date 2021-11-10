@@ -1,12 +1,30 @@
-/* eslint-disable no-continue */
 /* eslint-disable prefer-const */
 /* eslint-disable camelcase */
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable prefer-destructuring */
+/* eslint-disable no-continue */
+/* eslint-disable no-restricted-syntax */
 import { screen, whisper, window } from '@oliveai/ldk';
-// import { write } from '../../dist/clipboard';
+import { write } from '../../dist/clipboard';
 
-const writeWhisper = (labelV, body) =>
+
+// export const writeWhisper = (): Promise<boolean> =>
+//   new Promise(async (resolve, reject) => {
+//     try {
+
+//       whisper.create({
+//         label: formLabel,
+//         onClose: () => {
+//           // do nothing.
+//         },
+//         components: [...components,
+//             resolveRejectButtons(resolve, reject),],
+//       });
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   });
+
+const writeWhisper = (labelV: string, body: string) =>
   whisper.create({
     label: labelV,
     onClose: () => {
@@ -29,7 +47,7 @@ const writeWhisper = (labelV, body) =>
   });
 
 // eslint-disable-next-line camelcase
-const rebuild_image = (results) => {
+const rebuild_image = (results: screen.OCRResult[]) => {
   const lines = [];
   for (const box of results) {
     if (box.level === undefined) {
@@ -53,7 +71,7 @@ const rebuild_image = (results) => {
   }
 
   let full_text = [];
-  for (const para of lines) {
+  for (const para: any of lines) {
     let para_temp = [];
     for (const list_of_words of para) {
       para_temp.push(list_of_words.join(' '));
@@ -64,7 +82,7 @@ const rebuild_image = (results) => {
   return full_text.join('\n\n');
 };
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -84,8 +102,8 @@ async function performOcr() {
     screen
       .ocr(ocrCoordinates)
       .then((result) => {
-         console.log("OCR Results: ");
-         console.log(JSON.stringify(result));
+        // console.log("OCR Results: ");
+        // console.log(JSON.stringify(result));
 
         console.log(rebuild_image(result));
         let resFilter = result.filter((res) => res.confidence > 75);
