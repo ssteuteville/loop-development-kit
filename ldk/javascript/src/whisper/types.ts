@@ -444,6 +444,7 @@ export type ChildComponents =
   | Box
   | Button
   | Checkbox
+  | CollapseBox
   | DateTimeInput
   | Divider
   | DropZone
