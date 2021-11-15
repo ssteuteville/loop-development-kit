@@ -246,4 +246,10 @@ export const whisperTestGroup = (): TestGroup =>
       10000,
       'Does the JustifyContent-Normal items behave as "stretch" in flex container?',
     ),
+    new LoopTest(
+      'Whisper Aptitude - MultiLayers',
+      whisperTests.testMultiLayers,
+      10000,
+      'Does the multilayers look good?',
+    ),
   ]);

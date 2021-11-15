@@ -30,7 +30,7 @@ export function mapToInternalChildComponent(
   component: BoxChildComponent,
   stateMap: StateMap,
 ): WhisperService.ChildComponents {
-  const onClick = 'onClick' in component ? component.onClick : null;
+const onClick = ('onClick' in component&& component.type!== WhisperComponentType.CollapseBox )? component.onClick : null;
   switch (component.type) {
     case WhisperComponentType.Box:
       // eslint-disable-next-line no-case-declarations
@@ -68,6 +68,22 @@ export function mapToInternalChildComponent(
           component.onChange(error, param, mapToExternalWhisper(whisper, stateMap));
         },
       } as WhisperService.Checkbox;
+    case WhisperComponentType.CollapseBox:
+      // eslint-disable-next-line no-case-declarations
+      const onClickParam = component.onClick;
+      if (component.id && component.open) {
+        stateMap.set(component.id, component.open);
+      }
+      return {
+        ...component,
+        children: throwForDuplicateKeys(
+          component.children.map((childComponent) =>
+            mapToInternalChildComponent(childComponent, stateMap),
+          ),
+        ),
+        onClick: onClickParam? (error,param, whisper) => onClickParam(error,param, mapToExternalWhisper(whisper, stateMap))
+          : undefined,
+      } as WhisperService.CollapseBox;
     case WhisperComponentType.Email:
       if (component.id && component.value) {
         stateMap.set(component.id, component.value);
@@ -306,26 +322,7 @@ export function mapToInternalComponent(
   component: Component,
   stateMap: StateMap,
 ): WhisperService.Components {
-  switch (component.type) {
-    case WhisperComponentType.CollapseBox:
-      // eslint-disable-next-line no-case-declarations
-      const onClick = 'onClick' in component ? component.onClick : null;
-      return {
-        ...component,
-        children: throwForDuplicateKeys(
-          component.children.map((childComponent) =>
-            mapToInternalChildComponent(childComponent, stateMap),
-          ),
-        ),
-        type: WhisperComponentType.CollapseBox,
-        onClick: onClick
-          ? (error, param, whisper) =>
-              onClick(error, param, mapToExternalWhisper(whisper, stateMap))
-          : undefined,
-      } as WhisperService.CollapseBox;
-    default:
-      return mapToInternalChildComponent(component, stateMap);
-  }
+  return mapToInternalChildComponent(component, stateMap);
 }
 
 export function mapToInternalWhisper(

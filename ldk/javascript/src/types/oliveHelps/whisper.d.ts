@@ -266,6 +266,7 @@ declare namespace WhisperService {
     | Box
     | Button
     | Checkbox
+    | CollapseBox
     | Divider
     | DropZone
     | Email
@@ -284,7 +285,7 @@ declare namespace WhisperService {
     | Icon
     | SectionTitle;
 
-  type Components = ChildComponents | CollapseBox;
+  type Components = ChildComponents;
 
   interface NewWhisper {
     label: string;

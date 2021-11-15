@@ -8,6 +8,7 @@ import {
   Icon,
   IconSize,
   JustifyContent,
+  Link,
   NumberInput,
   RadioGroup,
   Select,
@@ -580,33 +581,112 @@ export const testIconUpdates = (): Promise<boolean> =>
     let whisperUpdated = false;
 
     const checkbox: Checkbox = {
-      label: 'Check this box and click update...',
+      label: 'Knee Replacement/Arthroplasty',
       key: 'Checkbox',
       id: 'myCheckbox',
+
       onChange: () => {
         // do nothing.
       },
       type: WhisperComponentType.Checkbox,
     };
 
-    const phoneIcon: Icon = {
-      type: WhisperComponentType.Icon,
-      name: 'touch_app',
-      key: 'myPhoneKey',
-      size: IconSize.XLarge,
+    const checkboxLevel2: Checkbox = {
+      label:
+        'Partial knee replacement (medial, lateral, or patellofemoral unicompartmental) is considered medically necessary when ALL of the following criteria have been met:',
+      key: 'Checkbox2',
+      id: 'myCheckbox2',
+      layout: {
+        paddingLeft: whisper.StyleSize.Medium,
+      },
+      onChange: () => {
+        // do nothing.
+      },
+      type: WhisperComponentType.Checkbox,
+    };
+
+    const linkLevel2: Link = {
+      type: WhisperComponentType.Link,
+      text: 'Indications: (0 OF 1) REQUIREMENTS',
       onClick: (_error: Error, onClickWhisper: Whisper) => {
-        if (onClickWhisper.componentState.get(checkbox.id) && whisperUpdated) {
-          resolve(true);
-          onClickWhisper.close((error) => {
-            console.error(error);
-          });
-        }
-        reject('Icon update caused checkbox state failure.');
-        onClickWhisper.close((error) => {
-          console.error(error);
+        whisperUpdated = true;
+        onClickWhisper.update({
+          components: [
+            checkbox,
+            link,
+            checkboxLevel2,
+            linkLevel2,
+
+            {
+              type: WhisperComponentType.Checkbox,
+              label:
+                'Patellofemoral unicompartmental replacement to manage protracted anterior knee pain and/or mechanical symptoms attributed to the patellofemoral joint following a total knee replacement, during which patellar replacement was not performed at the time of the index knee replacement, is considered medically necessary when the above criteria are met for the performance of patellofemoral unicompartmental replacement, with the exception of radiographic criteria.',
+              key: 'CheckboxLevel3',
+              id: 'myCheckboxLevel3',
+              layout: {
+                paddingLeft: whisper.StyleSize.Large,
+              },
+
+              onChange: () => {
+                // do nothing.
+              },
+            },
+            linkLevel3,
+          ],
         });
       },
-      tooltip: 'Touch App',
+    };
+    const link: Link = {
+      type: WhisperComponentType.Link,
+      text: '(0 OF 1) REQUIREMENTS',
+      onClick: (_error: Error, onClickWhisper: Whisper) => {
+        whisperUpdated = true;
+        onClickWhisper.update({
+          components: [
+            checkbox,
+            link,
+            checkboxLevel2,
+            linkLevel2,
+            {
+              type: WhisperComponentType.Message,
+              body: 'Click the touch icon',
+            },
+          ],
+        });
+      },
+    };
+
+    const linkLevel3: Link = {
+      type: WhisperComponentType.Link,
+      text: 'Indications: (0 OF 4) REQUIREMENTS',
+      onClick: (_error: Error, onClickWhisper: Whisper) => {
+        resolve(true);
+        whisperUpdated = true;
+        onClickWhisper.update({
+          components: [
+            checkbox,
+            link,
+            checkboxLevel2,
+            linkLevel2,
+            {
+              type: WhisperComponentType.Checkbox,
+              label:
+                'Level 3 Patellofemoral unicompartmental replacement to manage protracted anterior knee pain and/or mechanical symptoms attributed to the patellofemoral joint following a total knee replacement, during which patellar replacement was not performed at the time of the index knee replacement, is considered medically necessary when the above criteria are met for the performance of patellofemoral unicompartmental replacement, with the exception of radiographic criteria.',
+              key: 'CheckboxLevel3',
+              id: 'myCheckboxLevel3',
+              layout: {
+                marginLeft: whisper.StyleSize.Large,
+              },
+              onChange: () => {
+                // do nothing.
+              },
+            },
+          ],
+        });
+        if (null) {
+          reject('Icon update caused checkbox state failure.');
+        }
+      },
     };
 
     await whisper.create({
@@ -615,7 +695,6 @@ export const testIconUpdates = (): Promise<boolean> =>
         console.debug('closed');
       },
       components: [
-        phoneIcon,
         checkbox,
         {
           type: WhisperComponentType.Button,
@@ -623,14 +702,7 @@ export const testIconUpdates = (): Promise<boolean> =>
           onClick: (_error: Error, onClickWhisper: Whisper) => {
             whisperUpdated = true;
             onClickWhisper.update({
-              components: [
-                checkbox,
-                phoneIcon,
-                {
-                  type: WhisperComponentType.Message,
-                  body: 'Click the touch icon',
-                },
-              ],
+              components: [checkbox, link, checkboxLevel2, linkLevel2, linkLevel3],
             });
           },
         },

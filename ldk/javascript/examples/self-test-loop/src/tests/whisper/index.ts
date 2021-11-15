@@ -2473,13 +2473,15 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           ...componentsToGroup,
           divider,
           {
-            body: 'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
@@ -2493,7 +2495,8 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
@@ -2891,6 +2894,211 @@ export const testMissingLayouts = (): Promise<boolean> =>
           label: 'This is a label',
           value: 'This is a list pair with top margin',
           style: Urgency.None,
+        },
+        resolveRejectButtons(resolve, reject, 'Yes', 'No', true),
+      ],
+    });
+  });
+
+// export const testMultiLayers = (): Promise<boolean> =>
+//   new Promise(async (resolve, reject) => {
+//     await whisper.create({
+//       label: 'Did multilayers look good',
+//       onClose: () => {
+//         console.debug('closed');
+//       },
+//       components: [
+//         {
+//           type: WhisperComponentType.Message,
+//           layout: {
+//             flex: '1',
+//             marginTop: StyleSize.Medium,
+//           },
+//           body: 'This is a message with a top margin and flex',
+//           style: Urgency.Success,
+//         },
+//         {
+//           type: WhisperComponentType.CollapseBox,
+//           label: '->',
+//           children: [
+//             {
+//               body: 'FirstLayer',
+//               type: WhisperComponentType.Markdown,
+//             },
+//             {
+//               type: WhisperComponentType.CollapseBox,
+//               open: false,
+//               children: [
+//                 {
+//                   body: '  2ndLayer',
+//                   type: WhisperComponentType.Markdown,
+//                 },
+//               ],
+//             },
+//             {
+//               type: WhisperComponentType.CollapseBox,
+//               children: [
+//                 {
+//                   label: '->',
+//                   open: false,
+//                   children: [
+//                     {
+//                       body: '  3rdLayer',
+//                       type: WhisperComponentType.Markdown,
+//                     },
+//                     {
+//                       body: '  3rdLayer',
+//                       type: WhisperComponentType.Markdown,
+//                     },
+//                     {
+//                       body: '  3rdLayer',
+//                       type: WhisperComponentType.Markdown,
+//                     },
+//                   ],
+//                   type: WhisperComponentType.CollapseBox,
+//                 },
+//               ],
+
+//               open: true,
+//             },
+//           ],
+//           open: true,
+//         },
+//         resolveRejectButtons(resolve, reject, 'Yes', 'No', true),
+//       ],
+//     });
+//   });
+
+export const testMultiLayers = (): Promise<boolean> =>
+  new Promise(async (resolve, reject) => {
+    await whisper.create({
+      label: 'Did multilayers look good',
+      onClose: () => {
+        console.debug('closed');
+      },
+      components: [
+        {
+          type: WhisperComponentType.Markdown,
+          body: 'Knee Replacement/Arthroplasty REQUIREMENTS',
+        },
+        {
+          type: WhisperComponentType.CollapseBox,
+          label: ' Expend All',
+          open: false,
+          children: [
+            { type: WhisperComponentType.Divider },
+            {
+              type: WhisperComponentType.Markdown,
+              body: '    \n Partial Knee Replacement \n (0 OF 2) REQUIREMENTS',
+            },
+            {
+              type: WhisperComponentType.Box,
+              direction: Direction.Vertical,
+              customHeight: CustomHeight.Large,
+              justifyContent: JustifyContent.FlexEnd,
+              children: [
+                { type: WhisperComponentType.Divider },
+                {
+                  type: WhisperComponentType.Markdown,
+                  body:
+                    '      \n \t  Partial knee replacement \n (medial, lateral, or patellofemoral unicompartmental) is considered medically necessary when ALL of the following criteria have been met:\n (0 OF 6) REQUIREMENTS',
+                },
+                {
+                  type: WhisperComponentType.Box,
+                  customHeight: CustomHeight.Medium,
+                  direction: Direction.Vertical,
+                  justifyContent: JustifyContent.FlexEnd,
+                  children: [
+                    { type: WhisperComponentType.Divider },
+                    {
+                      type: WhisperComponentType.Markdown,
+                      body:
+                        '        \n \t \t Indications \n (medial, lateral, or patellofemoral unicompartmental) is considered medically necessary when ALL of the following criteria have been met:\n (0 OF 6) REQUIREMENTS',
+                    },
+                    {
+                      type: WhisperComponentType.Box,
+                      customHeight: CustomHeight.Small,
+                      direction: Direction.Vertical,
+                      justifyContent: JustifyContent.FlexEnd,
+                      children: [
+                        {
+                          type: WhisperComponentType.CollapseBox,
+                          label: '----',
+                          open: false,
+                          children: [
+                            {
+                              type: WhisperComponentType.Markdown,
+                              body: 'THIS IS MARKDOWN INSIDE COLLAPSEBOX at 2nd level',
+                            },
+                          ],
+                        },
+                        { type: WhisperComponentType.Divider },
+                        {
+                          type: WhisperComponentType.Box,
+                          customHeight: CustomHeight.Small,
+                          direction: Direction.Horizontal,
+                          justifyContent: JustifyContent.FlexEnd,
+                          children: [
+                            {
+                              type: WhisperComponentType.Checkbox,
+                              onChange: () => {
+                                console.log('Clicked');
+                              },
+                            },
+                            {
+                              type: WhisperComponentType.Markdown,
+                              body:
+                                'Function-limiting pain at short distances (e.g., walking less than ¼ mile, limiting activity to two city blocks, the equivalent to walking the length of a shopping mall) for at least three (3) months duration',
+                            },
+                          ],
+                        },
+                        {
+                          type: WhisperComponentType.Box,
+                          customHeight: CustomHeight.Small,
+                          direction: Direction.Horizontal,
+                          justifyContent: JustifyContent.FlexEnd,
+                          children: [
+                            {
+                              type: WhisperComponentType.Checkbox,
+                              onChange: () => {
+                                console.log('Clicked');
+                              },
+                            },
+                            {
+                              type: WhisperComponentType.Markdown,
+                              body:
+                                'Loss of knee function which interferes with the ability to carry out age appropriate activities of daily living and/or demands of employment',
+                            },
+                          ],
+                        },
+                        // {
+                        //   type: WhisperComponentType.Markdown,
+                        //   body:
+                        //     'Function-limiting pain at short distances (e.g., walking less than ¼ mile, limiting activity to two city blocks, the equivalent to walking the length of a shopping mall) for at least three (3) months duration',
+                        // },
+                        // {
+                        //   type: WhisperComponentType.Markdown,
+                        //   body:
+                        //     'Loss of knee function which interferes with the ability to carry out age appropriate activities of daily living and/or demands of employment',
+                        // },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: WhisperComponentType.CollapseBox,
+                  label: 'This is collapse box inside box',
+                  open: false,
+                  children: [
+                    {
+                      type: WhisperComponentType.Markdown,
+                      body: 'THIS IS MARKDOWN INSIDE COLLAPSEBOX at 2nd level',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         resolveRejectButtons(resolve, reject, 'Yes', 'No', true),
       ],
