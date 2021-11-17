@@ -2978,8 +2978,13 @@ export const testMultiLayers = (): Promise<boolean> =>
       },
       components: [
         {
+          type: WhisperComponentType.Message,
+          body: 'Click the touch icon www.amazon.com',
+          style: Urgency.Warning,
+        },
+        {
           type: WhisperComponentType.Markdown,
-          body: 'Knee Replacement/Arthroplasty REQUIREMENTS',
+          body: 'Click the touch icon www.amazon.com',
         },
         {
           type: WhisperComponentType.CollapseBox,

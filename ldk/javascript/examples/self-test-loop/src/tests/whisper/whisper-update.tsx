@@ -649,7 +649,7 @@ export const testIconUpdates = (): Promise<boolean> =>
             linkLevel2,
             {
               type: WhisperComponentType.Message,
-              body: 'Click the touch icon',
+              body: 'Click the touch icon www.amazon.com',
             },
           ],
         });
