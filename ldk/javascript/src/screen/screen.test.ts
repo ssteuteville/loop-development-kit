@@ -39,8 +39,6 @@ describe('screen', () => {
       expect(actual).resolves.toBe(ocrResult);
     });
 
-    // test
-
     it('rejects with the error when the underlying call throws an error', () => {
       const exception = 'Exception';
       mocked(oliveHelps.screen.ocr).mockImplementation(() => {
