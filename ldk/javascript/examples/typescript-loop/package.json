@@ -2,10 +2,10 @@
   "name": "typescript-loop-example",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index.tsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --entry ./index.ts --config ./node_modules/@oliveai/ldk/dist/webpack/config.js"
+    "build": "webpack --entry ./index.tsx --config ./node_modules/@oliveai/ldk/dist/webpack/config.js"
   },
   "author": "LDK Team",
   "license": "ISC",
@@ -16,7 +16,13 @@
     }
   },
   "dependencies": {
-    "@oliveai/ldk": "file:../.."
+    "@babel/plugin-transform-react-jsx": "^7.16.0",
+    "@oliveai/ldk": "file:../..",
+    "@types/react": "^17.0.36",
+    "@types/react-reconciler": "^0.26.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-reconciler": "^0.26.2"
   },
   "devDependencies": {
     "ts-loader": "^8.1.0",
