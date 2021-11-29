@@ -12,32 +12,20 @@ const whisperConfig = {
       direction: 'horizontal',
       children: [
         {
-          type: 'box',
-          justifyContent: 'left',
-          direction: 'horizontal',
-          children: [
-            {
-              type: 'icon',
-              name: 'navigate_before',
-              size: 'medium',
-              color: 'black',
-            },
-          ],
+          type: 'icon',
+          name: 'call',
+          size: 'large',
+          onClick: () => {
+            console.info('Call Clicked');
+          },
+          tooltip: 'Phone a friend',
         },
         {
-          type: 'box',
-          justifyContent: 'center',
-          direction: 'horizontal',
-          children: [
-            {
-              type: 'message',
-              body: 'Telepsychiatry for ian',
-              textAlign: 'center',
-            },
-          ],
-          layout: {
-            width: 'full',
-            flex: 'auto',
+          type: 'icon',
+          name: 'call',
+          size: 'large',
+          onClick: () => {
+            console.info('Call Clicked');
           },
         },
       ],
@@ -340,5 +328,5 @@ whisper.create(whisperConfig).then((whisperObj) => {
         },
       ],
     });
-  }, 1500);
+  }, 15000);
 });
