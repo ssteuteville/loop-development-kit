@@ -46,7 +46,7 @@ export const testIconLayout = (): Promise<boolean> =>
         {
           type: WhisperComponentType.Box,
           direction: Direction.Horizontal,
-          justifyContent: JustifyContent.SpaceEvenly,
+          justifyContent: JustifyContent.Center,
           children: [
             {
               type: WhisperComponentType.Icon,
@@ -1833,22 +1833,31 @@ export const testCollapseBoxOnClick = (): Promise<boolean> =>
 
 export const testSectionTitle = (): Promise<boolean> =>
   new Promise(async (resolve, reject) => {
+    const sectionTitleMarkdown = stripIndent`
+    # Links:
+    [Some Link 1](# "A Link")
+    Text between links
+    [Some Link 2](#)
+    Text between links
+    http://google.com
+    `;
+
     try {
       await whisper.create({
         label: 'Did Section Title render correctly?',
         components: [
           {
-            body: 'section Title in center',
+            body: 'no markdown',
             type: WhisperComponentType.SectionTitle,
             textAlign: TextAlign.Center,
           },
           {
-            body: 'section Title on the left',
+            body: '**Strong Option**',
             type: WhisperComponentType.SectionTitle,
             textAlign: TextAlign.Left,
           },
           {
-            body: 'section Title on the right(white)',
+            body: sectionTitleMarkdown,
             type: WhisperComponentType.SectionTitle,
             textAlign: TextAlign.Right,
             backgroundStyle: Color.White,
@@ -1875,7 +1884,7 @@ export const testDateTime = (): Promise<boolean> =>
       ['Time', false],
       ['DateTime', false],
     ]);
-
+    let newValue = '';
     try {
       const components: Component[] = [
         {
@@ -1888,11 +1897,12 @@ export const testDateTime = (): Promise<boolean> =>
             if (param) {
               console.debug(`Date picker value received: ${param}`);
               onActionWrapper(error, 'Date', resolverMap, onChangeWhisper, resolve, reject);
+              newValue = param;
             }
           },
           tooltip: 'Date picker',
           min: new Date(2020, 0, 1),
-          value: new Date(2021, 0, 1),
+          value: new Date(Date.parse(newValue)),
           max: new Date(2022, 11, 31),
         },
         {
@@ -2513,13 +2523,15 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           ...componentsToGroup,
           divider,
           {
-            body: 'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare the elements wrapped in a box below. Do they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
@@ -2533,7 +2545,8 @@ export const testPadding = (): Promise<boolean> =>
           },
           divider,
           {
-            body: 'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
+            body:
+              'Compare elements wrapped in a collapsible box below. Does they have padding? Do the labels appear in the correct place?',
             type: WhisperComponentType.Markdown,
           },
           {
@@ -3085,8 +3098,18 @@ export const testManyClickBreadcrumbs = (): Promise<boolean> =>
               type: WhisperComponentType.Link,
               text: 'Breadcrumb 5',
               onClick: (_error: Error, onClickWhisper: Whisper) => {
-                onClickWhisper.close((e) => console.log(e));
-                resolve(true);
+                onClickWhisper.update({
+                  components: [
+                    {
+                      type: whisper.WhisperComponentType.Box,
+                      children: [
+                        { type: whisper.WhisperComponentType.Markdown, body: 'Hello World' },
+                      ],
+                      justifyContent: JustifyContent.Left,
+                      direction: Direction.Vertical,
+                    },
+                  ],
+                });
               },
             },
             {
@@ -3200,7 +3223,8 @@ export const testProgressIndicator = (): Promise<boolean> =>
         },
         {
           type: WhisperComponentType.Markdown,
-          body: 'This is a progress indicator, size: None. If no size is set or size is set to None, it will be its default value: Medium',
+          body:
+            'This is a progress indicator, size: None. If no size is set or size is set to None, it will be its default value: Medium',
         },
         {
           type: WhisperComponentType.Progress,

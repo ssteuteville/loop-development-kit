@@ -1,4 +1,5 @@
 import { user, clipboard, whisper } from '@oliveai/ldk';
+import { jwt } from '../../../../../dist/user';
 
 export const testJwt = (): Promise<boolean> =>
   new Promise((resolve, reject) => {
@@ -48,6 +49,7 @@ export const testJwtExcludeEmail = (): Promise<boolean> =>
               text: 'Click here to copy the JWT to your clipboard.',
               onClick: async () => {
                 await clipboard.write(token);
+                console.log(token)
               },
             },
             {

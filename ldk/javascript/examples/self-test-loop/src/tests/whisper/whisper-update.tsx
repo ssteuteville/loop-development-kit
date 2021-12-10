@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { whisper } from '@oliveai/ldk';
 import {
+  Box,
   Breadcrumbs,
   Button,
   Checkbox,
@@ -694,6 +695,12 @@ export const testBreadcrumbUpdates = (): Promise<boolean> =>
       type: WhisperComponentType.Link,
       text: 'Breadcrumb 2',
     });
+    const box: Box = {
+      type: whisper.WhisperComponentType.Box,
+      children: [{ type: whisper.WhisperComponentType.Message, body: 'Hello World' }],
+      justifyContent: whisper.JustifyContent.Center,
+      direction: whisper.Direction.Vertical,
+    };
 
     link.text = 'Click Me';
 
@@ -703,7 +710,7 @@ export const testBreadcrumbUpdates = (): Promise<boolean> =>
 
     theWhisper.update({
       label: 'Breadcrumb Update Test',
-      components: [breadcrumb],
+      components: [box],
     });
 
     await promise;
